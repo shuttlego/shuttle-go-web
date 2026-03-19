@@ -6741,11 +6741,11 @@
       var routeOptionsWrap = document.getElementById('routeOptionsWrap');
       var routeSortBar = document.getElementById('routeSortBar');
       var routeSearchModeIndicator = document.getElementById('routeSearchModeIndicator');
-      var currentSortMode = 'time';
-      var defaultRouteSearchMode = 'time';
-      var activeRouteSearchMode = 'time';
-      var currentRouteSearchModeUsed = 'time';
-      var settingsDraftRouteSearchMode = 'time';
+      var currentSortMode = 'distance';
+      var defaultRouteSearchMode = 'distance';
+      var activeRouteSearchMode = 'distance';
+      var currentRouteSearchModeUsed = 'distance';
+      var settingsDraftRouteSearchMode = 'distance';
       var maxDistanceTrigger = document.getElementById('maxDistanceTrigger');
       var maxDistancePopover = document.getElementById('maxDistancePopover');
       var maxDistanceSlider = document.getElementById('maxDistanceSlider');
@@ -6824,6 +6824,7 @@
       var arrivalReportStopMapInstance = null;
       var arrivalReportStopMapOverlays = [];
       var arrivalReportStopMapCurrentOverlay = null;
+      var mobilePageZoomGuardInstalled = false;
       var activeOptionDrawToken = 0;
       var routeLabelTriggeredDetailState = null;
       var authState = { logged_in: false, user: null, preferences: {} };
@@ -7118,6 +7119,49 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function isMobile() {
         return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+      }
+
+      function normalizeGestureTarget(target) {
+        if (!target) return null;
+        if (target.nodeType === 1) return target;
+        return target.parentElement || null;
+      }
+
+      function isZoomAllowedMapTarget(target) {
+        var node = normalizeGestureTarget(target);
+        if (!node || typeof node.closest !== 'function') return false;
+        return !!node.closest('.map-wrap, #arrivalReportStopMapWrap');
+      }
+
+      function shouldBlockMobilePageZoom(event) {
+        if (!isMobile() || !event) return false;
+        var type = String(event.type || '');
+        if (type === 'touchmove') {
+          return !!(event.touches && event.touches.length > 1) && !isZoomAllowedMapTarget(event.target);
+        }
+        if (type === 'gesturestart' || type === 'gesturechange' || type === 'gestureend') {
+          return !isZoomAllowedMapTarget(event.target);
+        }
+        return false;
+      }
+
+      function preventMobilePageZoomOutsideMaps(event) {
+        if (!shouldBlockMobilePageZoom(event)) return;
+        if (typeof event.preventDefault === 'function') {
+          event.preventDefault();
+        }
+      }
+
+      function installMobilePageZoomGuard() {
+        if (mobilePageZoomGuardInstalled || !document || typeof document.addEventListener !== 'function') {
+          return;
+        }
+        mobilePageZoomGuardInstalled = true;
+        var listenerOptions = { passive: false, capture: true };
+        document.addEventListener('touchmove', preventMobilePageZoomOutsideMaps, listenerOptions);
+        document.addEventListener('gesturestart', preventMobilePageZoomOutsideMaps, listenerOptions);
+        document.addEventListener('gesturechange', preventMobilePageZoomOutsideMaps, listenerOptions);
+        document.addEventListener('gestureend', preventMobilePageZoomOutsideMaps, listenerOptions);
       }
 
       function resetPlaceHistoryState() {
@@ -11648,7 +11692,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           .then(function(r) { return r.json(); })
           .then(function(data) {
             var list = data.sites || [];
-            dbUpdatedAt = data.db_updated_at || '';
+            applyRouteCollectorUpdatedAt(data);
             siteSelect.innerHTML = '';
             if (list.length === 0) {
               siteSelect.appendChild(new Option('삼성전자(수원)', '0000013'));
@@ -14988,7 +15032,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function normalizeRouteSearchMode(value) {
         var mode = String(value || '').trim().toLowerCase();
-        return (mode === 'distance') ? 'distance' : 'time';
+        return (mode === 'time') ? 'time' : 'distance';
       }
 
       function normalizeRouteMaxDistanceKm(value) {
@@ -15031,7 +15075,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function applyRouteSearchPreferences(preferences) {
         var prefs = preferences || {};
-        var nextMode = normalizeRouteSearchMode(prefs.route_search_mode || 'time');
+        var nextMode = normalizeRouteSearchMode(prefs.route_search_mode || 'distance');
         var nextDefaultMaxDistance = normalizeRouteMaxDistanceKm(
           prefs.route_max_distance_km != null ? prefs.route_max_distance_km : 3
         );
@@ -15313,6 +15357,59 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           });
       }
 
+      function extractRouteCollectorUpdatedAt(data) {
+        if (!data || typeof data !== 'object') return '';
+        return String(data.route_collector_updated_at || data.db_updated_at || '').trim();
+      }
+
+      function applyRouteCollectorUpdatedAt(data, target) {
+        var updatedAtText = extractRouteCollectorUpdatedAt(data);
+        if (!updatedAtText) return '';
+        dbUpdatedAt = updatedAtText;
+        if (Array.isArray(target)) {
+          target.forEach(function(item) {
+            if (!item || typeof item !== 'object') return;
+            item.__routeCollectorUpdatedAt = updatedAtText;
+          });
+        } else if (target && typeof target === 'object') {
+          target.__routeCollectorUpdatedAt = updatedAtText;
+        }
+        return updatedAtText;
+      }
+
+      function getRouteCardUpdatedAt(option) {
+        if (option && typeof option === 'object') {
+          var optionUpdatedAt = String(option.__routeCollectorUpdatedAt || '').trim();
+          if (optionUpdatedAt) return optionUpdatedAt;
+        }
+        return String(dbUpdatedAt || '').trim();
+      }
+
+      function syncRouteUpdatedInfo(panel, updatedAtText) {
+        if (!panel) return;
+        var value = String(updatedAtText || '').trim();
+        var updated = panel.querySelector('.route-db-updated');
+        if (!value) {
+          if (updated && updated.parentNode) updated.parentNode.removeChild(updated);
+          return;
+        }
+        if (!updated) {
+          updated = document.createElement('div');
+          updated.className = 'route-db-updated';
+          var noteDivider = panel.querySelector('.route-detail-note-divider');
+          if (noteDivider && noteDivider.parentNode === panel) {
+            if (noteDivider.nextSibling) {
+              panel.insertBefore(updated, noteDivider.nextSibling);
+            } else {
+              panel.appendChild(updated);
+            }
+          } else {
+            panel.appendChild(updated);
+          }
+        }
+        updated.textContent = '마지막 업데이트: ' + value;
+      }
+
       function renderRouteCards(options, placeName, isDepart) {
         routeOptionsWrap.innerHTML = '';
         expandedOptionIndex = -1;
@@ -15355,6 +15452,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               (bold ? '</b>' : '') +
             '</div>';
           }).join('');
+          var optionUpdatedAt = getRouteCardUpdatedAt(opt);
           card.innerHTML =
             '<div class="card-main">' +
               '<div class="card-title-wrap">' +
@@ -15381,7 +15479,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               '<div class="detail-title">노선 경유지</div>' +
               '<div class="route-stops-list">' + (stopsHtml || '-') + '</div>' +
               (opt.operator ? '<div class="route-operator-info">' + escapeHtml(opt.operator) + '</div>' : '') +
-              (dbUpdatedAt ? '<div class="route-db-updated">마지막 업데이트: ' + escapeHtml(dbUpdatedAt) + '</div>' : '') +
+              (optionUpdatedAt ? '<div class="route-db-updated">마지막 업데이트: ' + escapeHtml(optionUpdatedAt) + '</div>' : '') +
             '</div>';
           var btnDetail = card.querySelector('.btn-route-detail');
           var btnShare = card.querySelector('.btn-route-share');
@@ -15442,6 +15540,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               walkOtpEnabled = data.walk_otp_enabled;
             }
             var newOptions = (data.options || []);
+            applyRouteCollectorUpdatedAt(data, newOptions);
             if (newOptions.length === 0) {
               btn.textContent = '추가 노선 없음';
               btn.disabled = true;
@@ -15635,6 +15734,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               .then(function(result) {
                 if (requestId !== routeRequestSerial) return;
                 var data = result.data || {};
+                var options = data.options || [];
+                applyRouteCollectorUpdatedAt(data, options);
                 if (!result.ok && data.options == null) {
                   showShuttleError(data.error || (isDepart ? '출근 노선 조회에 실패했습니다.' : '퇴근 노선 조회에 실패했습니다.'));
                   return;
@@ -15646,7 +15747,6 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
                 if (typeof data.walk_otp_enabled === 'boolean') {
                   walkOtpEnabled = data.walk_otp_enabled;
                 }
-                var options = data.options || [];
                 options._searchMode = normalizeRouteSearchMode(data.search_mode || activeRouteSearchMode);
                 renderRouteOptions(options, name, isDepart, data.last_departure_time || '', opts.preserveSheetState);
               });
@@ -19261,6 +19361,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         if (!card) return;
         var panel = card.querySelector('.route-detail-panel');
         if (!panel) return;
+        var updatedAtText = getRouteCardUpdatedAt(option);
+        syncRouteUpdatedInfo(panel, updatedAtText);
         var departureTimesEl = panel.querySelector('.departure-times');
         if (departureTimesEl) {
           departureTimesEl.querySelectorAll('.time-item').forEach(function(node) {
@@ -19298,14 +19400,9 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           } else {
             panel.appendChild(noteEl);
             panel.appendChild(dividerEl);
-            if (dbUpdatedAt) {
-              var updated = document.createElement('div');
-              updated.className = 'route-db-updated';
-              updated.textContent = '마지막 업데이트: ' + dbUpdatedAt;
-              panel.appendChild(updated);
-            }
           }
         }
+        syncRouteUpdatedInfo(panel, updatedAtText);
       }
 
       function bindRouteStopEtaClicks(card, option) {
@@ -19327,6 +19424,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function applyRouteVariantDetailToCard(card, option, placeName, isDepart, detail) {
         if (!card || !option || !detail) return;
+        applyRouteCollectorUpdatedAt(detail, option);
         var selectedTime = String(detail.selected_departure_time || option.__activeDetailTime || option.board_time || '');
         option.__activeDetailTime = selectedTime;
         if (Array.isArray(detail.route_stops)) option.route_stops = detail.route_stops;
@@ -19365,6 +19463,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           operatorInfo.style.display = nextOperatorText ? '' : 'none';
         }
         option.operator = nextOperatorText;
+        syncRouteUpdatedInfo(panel, getRouteCardUpdatedAt(option));
         if (card.classList.contains('expanded') && card.classList.contains('selected')) {
           drawRouteDetailOnMap(option, placeName, isDepart, option.__detailHighlightTarget || null, false);
           if (option.__detailOpenedFromMapLabel) {
@@ -19578,6 +19677,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       updateArrivalReportButtonVisibility();
       updateDevDebugUi();
+      installMobilePageZoomGuard();
 
       updateAccountMenuUi();
       pendingSharedRouteToken = parseShareTokenFromLocation();
