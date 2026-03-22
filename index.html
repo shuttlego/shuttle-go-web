@@ -195,6 +195,20 @@
       scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
     }
+    .time-picker-column .time-picker-items.drag-scroll-enabled {
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .time-picker-column .time-picker-items.drag-scroll-enabled * {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .time-picker-column .time-picker-items.is-dragging {
+      cursor: grabbing;
+      scroll-behavior: auto;
+    }
     .time-picker-column .time-picker-item {
       height: 40px;
       line-height: 40px;
@@ -5085,6 +5099,20 @@
       overscroll-behavior-y: contain;
       touch-action: pan-y;
       scrollbar-width: none;
+    }
+    .report-time-items.drag-scroll-enabled {
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .report-time-items.drag-scroll-enabled * {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .report-time-items.is-dragging {
+      cursor: grabbing;
+      scroll-behavior: auto;
     }
     .report-time-items::-webkit-scrollbar {
       display: none;
@@ -10069,6 +10097,172 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         });
       }
 
+      function shouldUseSmoothWheelAnimation() {
+        if (typeof window !== 'undefined' && window.matchMedia) {
+          if (window.matchMedia('(pointer: coarse)').matches) return true;
+        }
+        return !!isMobile();
+      }
+
+      function cancelWheelSnap(scroller) {
+        if (!scroller) return;
+        if (scroller.__rafId) {
+          cancelAnimationFrame(scroller.__rafId);
+          scroller.__rafId = 0;
+        }
+        if (scroller.__snapTimer) {
+          clearTimeout(scroller.__snapTimer);
+          scroller.__snapTimer = 0;
+        }
+        if (scroller.__smoothSnapDoneTimer) {
+          clearTimeout(scroller.__smoothSnapDoneTimer);
+          scroller.__smoothSnapDoneTimer = 0;
+        }
+        if (scroller.__smoothSnapActive) {
+          scroller.scrollTo({
+            top: Number(scroller.scrollTop || 0),
+            behavior: 'auto'
+          });
+          scroller.__smoothSnapActive = false;
+        }
+      }
+
+      function scrollWheelListTo(scroller, top, smooth) {
+        if (!scroller) return;
+        cancelWheelSnap(scroller);
+        var useSmooth = !!smooth && shouldUseSmoothWheelAnimation();
+        scroller.__smoothSnapActive = useSmooth;
+        scroller.scrollTo({
+          top: top,
+          behavior: useSmooth ? 'smooth' : 'auto'
+        });
+        if (useSmooth) {
+          scroller.__smoothSnapDoneTimer = setTimeout(function() {
+            scroller.__smoothSnapDoneTimer = 0;
+            scroller.__smoothSnapActive = false;
+          }, 220);
+        }
+      }
+
+      function bindDragScrollWheel(scroller, opts) {
+        opts = opts || {};
+        if (!scroller || scroller.__dragScrollBound) return;
+        scroller.__dragScrollBound = true;
+        scroller.classList.add('drag-scroll-enabled');
+
+        var state = {
+          active: false,
+          pointerId: null,
+          startY: 0,
+          startScrollTop: 0,
+          moved: false,
+          suppressClickUntil: 0
+        };
+        var moveThreshold = Math.max(4, Number(opts.moveThreshold || 6));
+        var allowTouchDrag = !!opts.allowTouchDrag;
+
+        function pointerMatches(e) {
+          if (!state.active) return false;
+          if (!e || e.pointerId == null || state.pointerId == null) return true;
+          return e.pointerId === state.pointerId;
+        }
+
+        function finishDrag(e) {
+          if (!state.active || !pointerMatches(e)) return;
+          var moved = !!state.moved;
+          state.active = false;
+          state.pointerId = null;
+          state.moved = false;
+          scroller.classList.remove('is-dragging');
+          if (e && scroller.releasePointerCapture && e.pointerId != null) {
+            try {
+              scroller.releasePointerCapture(e.pointerId);
+            } catch (_) {}
+          }
+          if (typeof opts.onDragEnd === 'function') {
+            opts.onDragEnd({ moved: moved });
+          }
+        }
+
+        scroller.addEventListener('pointerdown', function(e) {
+          if (!e || (e.button != null && e.button !== 0)) return;
+          if (String(e.pointerType || '').toLowerCase() === 'touch' && !allowTouchDrag) {
+            cancelWheelSnap(scroller);
+            return;
+          }
+          cancelWheelSnap(scroller);
+          state.active = true;
+          state.pointerId = e.pointerId != null ? e.pointerId : null;
+          state.startY = Number(e.clientY) || 0;
+          state.startScrollTop = Number(scroller.scrollTop || 0);
+          state.moved = false;
+          scroller.classList.add('is-dragging');
+          if (scroller.setPointerCapture && e.pointerId != null) {
+            try {
+              scroller.setPointerCapture(e.pointerId);
+            } catch (_) {}
+          }
+        });
+
+        scroller.addEventListener('pointermove', function(e) {
+          if (!pointerMatches(e)) return;
+          var deltaY = (Number(e.clientY) || 0) - state.startY;
+          if (!state.moved && Math.abs(deltaY) >= moveThreshold) {
+            state.moved = true;
+            state.suppressClickUntil = Date.now() + 250;
+          }
+          if (!state.moved) return;
+          scroller.scrollTop = state.startScrollTop - deltaY;
+          if (typeof opts.onDragMove === 'function') {
+            opts.onDragMove();
+          }
+          e.preventDefault();
+        });
+
+        scroller.addEventListener('pointerup', finishDrag);
+        scroller.addEventListener('pointercancel', finishDrag);
+        scroller.addEventListener('lostpointercapture', finishDrag);
+        scroller.addEventListener('wheel', function() {
+          cancelWheelSnap(scroller);
+        }, { passive: true });
+        scroller.addEventListener('touchstart', function() {
+          cancelWheelSnap(scroller);
+        }, { passive: true });
+        scroller.addEventListener('click', function(e) {
+          if (Date.now() >= state.suppressClickUntil) return;
+          state.suppressClickUntil = 0;
+          e.preventDefault();
+          e.stopPropagation();
+        }, true);
+      }
+
+      function scheduleTimePickerListSnap(listEl, itemHeight, maxIndex, onUpdate) {
+        if (!listEl) return;
+        if (listEl.__snapTimer) clearTimeout(listEl.__snapTimer);
+        listEl.__snapTimer = setTimeout(function() {
+          listEl.__snapTimer = 0;
+          var index = Math.round((Number(listEl.scrollTop) || 0) / itemHeight);
+          index = Math.max(0, Math.min(maxIndex, index));
+          scrollWheelListTo(listEl, index * itemHeight, true);
+          if (typeof onUpdate === 'function') onUpdate();
+        }, 96);
+      }
+
+      function scheduleDayTypeWheelSnap() {
+        if (!dayTypeList || DAY_TYPE_OPTIONS.length === 0) return;
+        scheduleTimePickerListSnap(
+          dayTypeList,
+          DAY_TYPE_ITEM_HEIGHT,
+          Math.max(0, DAY_TYPE_OPTIONS.length - 1),
+          updateDayTypeSelectedClasses
+        );
+      }
+
+      function scheduleTimePickerValueSnap(listEl, maxIndex) {
+        if (!listEl) return;
+        scheduleTimePickerListSnap(listEl, ITEM_HEIGHT, maxIndex, requestTimePickerSelectedClassesUpdate);
+      }
+
       function buildTimePickerWheels() {
         if (!timePickerHourList || !timePickerMinuteList) return;
         function pad(n, len) { var s = String(n); while (s.length < len) s = '0' + s; return s; }
@@ -10217,7 +10411,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       var pendingDayType = 'weekday';
 
       function buildDayTypeOptionsFromValues(dayTypeValues) {
-        if (!Array.isArray(dayTypeValues)) return DAY_TYPE_OPTIONS_BASE.slice();
+        if (!Array.isArray(dayTypeValues)) return DAY_TYPE_OPTIONS.slice();
         var out = [];
         var seen = {};
         dayTypeValues.forEach(function(raw) {
@@ -10237,10 +10431,11 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       }
 
       function applyAvailableDayTypes(dayTypeValues) {
-        DAY_TYPE_OPTIONS = buildDayTypeOptionsFromValues(dayTypeValues);
-        if (!Array.isArray(dayTypeValues) && DAY_TYPE_OPTIONS.length === 0) {
-          DAY_TYPE_OPTIONS = DAY_TYPE_OPTIONS_BASE.slice();
+        if (!Array.isArray(dayTypeValues)) {
+          updateDepartureTriggerText();
+          return;
         }
+        DAY_TYPE_OPTIONS = buildDayTypeOptionsFromValues(dayTypeValues);
 
         var hasSelected = DAY_TYPE_OPTIONS.some(function(opt) { return opt.value === selectedDayType; });
         if (!hasSelected) {
@@ -15439,6 +15634,23 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return (fallbackIndex != null ? fallbackIndex : -1);
       }
 
+      function getCurrentRouteOptionForCard(card, fallbackIndex) {
+        var options = Array.isArray(currentRouteOptions) ? currentRouteOptions : [];
+        if (!options.length) return null;
+        if (card) {
+          var renderToken = String(card.getAttribute('data-route-card-token') || '').trim();
+          if (renderToken) {
+            for (var i = 0; i < options.length; i += 1) {
+              if (String(options[i] && options[i].__renderCardToken || '').trim() === renderToken) {
+                return options[i];
+              }
+            }
+          }
+        }
+        var optionIndex = getRouteCardIndex(card, fallbackIndex);
+        return options[optionIndex] || options[fallbackIndex] || null;
+      }
+
       function activateRouteCardOptionView(card, option, placeName, isDepart) {
         if (!card || !option) return;
         routeLabelTriggeredDetailState = null;
@@ -15508,9 +15720,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var card = routeOptionsWrap.querySelector('.route-option-card.expanded') ||
           routeOptionsWrap.querySelector('.route-option-card.selected');
         if (!card) return false;
-        var optionIndex = getRouteCardIndex(card, expandedOptionIndex);
-        var options = Array.isArray(currentRouteOptions) ? currentRouteOptions : [];
-        var option = options[optionIndex] || options[expandedOptionIndex];
+        var option = getCurrentRouteOptionForCard(card, expandedOptionIndex);
         if (!option) return false;
         var placeName = currentPlaceName || (lastPlace && lastPlace.place_name) || '선택한 장소';
         activateRouteCardOptionView(card, option, placeName, !!currentIsDepart);
@@ -16650,6 +16860,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             var sorted = sortOptions(currentRouteOptions, currentSortMode);
             sorted._lastBatchSize = newOptions.length;
             sorted._searchMode = currentRouteOptions._searchMode;
+            currentRouteOptions = sorted;
             renderRouteCards(sorted, currentPlaceName, currentIsDepart);
           })
           .catch(function() {
@@ -16711,6 +16922,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var sorted = sortOptions(options, currentSortMode);
         sorted._lastBatchSize = options.length;
         sorted._searchMode = currentRouteSearchModeUsed;
+        currentRouteOptions = sorted;
         renderRouteCards(sorted, placeName, isDepart);
         if (isMobile() && !shouldPreserveSheetState) setSheetState('sheet-peek');
       }
@@ -17097,6 +17309,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           var sorted = sortOptions(currentRouteOptions, currentSortMode);
           sorted._lastBatchSize = currentRouteOptions._lastBatchSize;
           sorted._searchMode = currentRouteSearchModeUsed;
+          currentRouteOptions = sorted;
           renderRouteCards(sorted, currentPlaceName, currentIsDepart);
         }
       });
@@ -17108,6 +17321,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           var sorted = sortOptions(currentRouteOptions, currentSortMode);
           sorted._lastBatchSize = currentRouteOptions._lastBatchSize;
           sorted._searchMode = currentRouteSearchModeUsed;
+          currentRouteOptions = sorted;
           renderRouteCards(sorted, currentPlaceName, currentIsDepart);
         }
       });
@@ -17165,9 +17379,40 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         if (timePickerNow) timePickerNow.addEventListener('click', setTimePickerToNow);
         if (timePickerBackdrop) timePickerBackdrop.addEventListener('click', applyTimePicker);
         if (timePickerModal) timePickerModal.addEventListener('click', function(e) { e.stopPropagation(); });
-        if (dayTypeList) dayTypeList.addEventListener('scroll', updateDayTypeSelectedClasses);
-        if (timePickerHourList) timePickerHourList.addEventListener('scroll', requestTimePickerSelectedClassesUpdate);
-        if (timePickerMinuteList) timePickerMinuteList.addEventListener('scroll', requestTimePickerSelectedClassesUpdate);
+        if (dayTypeList) {
+          dayTypeList.addEventListener('scroll', function() {
+            updateDayTypeSelectedClasses();
+            scheduleDayTypeWheelSnap();
+          }, { passive: true });
+          bindDragScrollWheel(dayTypeList, {
+            onDragMove: updateDayTypeSelectedClasses,
+            onDragEnd: scheduleDayTypeWheelSnap
+          });
+        }
+        if (timePickerHourList) {
+          timePickerHourList.addEventListener('scroll', function() {
+            requestTimePickerSelectedClassesUpdate();
+            scheduleTimePickerValueSnap(timePickerHourList, 23);
+          }, { passive: true });
+          bindDragScrollWheel(timePickerHourList, {
+            onDragMove: requestTimePickerSelectedClassesUpdate,
+            onDragEnd: function() {
+              scheduleTimePickerValueSnap(timePickerHourList, 23);
+            }
+          });
+        }
+        if (timePickerMinuteList) {
+          timePickerMinuteList.addEventListener('scroll', function() {
+            requestTimePickerSelectedClassesUpdate();
+            scheduleTimePickerValueSnap(timePickerMinuteList, 59);
+          }, { passive: true });
+          bindDragScrollWheel(timePickerMinuteList, {
+            onDragMove: requestTimePickerSelectedClassesUpdate,
+            onDragEnd: function() {
+              scheduleTimePickerValueSnap(timePickerMinuteList, 59);
+            }
+          });
+        }
         // 리사이즈 시 탭 폭/텍스트를 함께 재측정
         window.addEventListener('resize', function() {
           syncHeaderTabWidth();
@@ -17800,7 +18045,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           var top = targetIndex * getItemHeight();
           if (itemsEl.__rafId) cancelAnimationFrame(itemsEl.__rafId);
           itemsEl.__rafId = requestAnimationFrame(function() {
-            itemsEl.scrollTo({ top: top, behavior: smooth ? 'smooth' : 'auto' });
+            scrollWheelListTo(itemsEl, top, !!smooth);
             updateSelected(itemNodes[targetIndex] && itemNodes[targetIndex].getAttribute('data-value'));
           });
         }
@@ -17827,6 +18072,14 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             if (typeof onSelect === 'function') onSelect(currentValue);
           }, 96);
         }, { passive: true });
+        bindDragScrollWheel(itemsEl, {
+          onDragEnd: function(context) {
+            if (!context || !context.moved) return;
+            var currentValue = getCurrentValueFromScroll();
+            scrollToValue(currentValue, true);
+            if (typeof onSelect === 'function') onSelect(currentValue);
+          }
+        });
 
         scrollToValue(selectedValue, false);
         return {
