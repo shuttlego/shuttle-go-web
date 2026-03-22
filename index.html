@@ -1744,6 +1744,26 @@
       font-weight: 700;
       color: #777;
     }
+    .endpoint-picker-section-header {
+      position: sticky;
+      z-index: 1;
+      top: 39px;
+      padding: 10px 16px 6px;
+      background: linear-gradient(180deg, #fff 0%, #fff 85%, rgba(255, 255, 255, 0.96) 100%);
+    }
+    .endpoint-picker-section-title {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: #555;
+      letter-spacing: -0.01em;
+    }
+    .endpoint-picker-section-divider {
+      display: block;
+      height: 1px;
+      margin-top: 6px;
+      background: #ececec;
+    }
     .endpoint-picker-item {
       width: 100%;
       display: flex;
@@ -3402,6 +3422,7 @@
       display: flex;
     }
     .route-option-card {
+      position: relative;
       flex-shrink: 0;
       padding: 14px 16px;
       margin-bottom: 8px;
@@ -3450,11 +3471,60 @@
       color: #1e5a8e;
       margin-top: 4px;
     }
+    .route-option-card .route-time-summary-head,
+    .route-option-card .route-time-summary-body {
+      display: none;
+    }
+    .route-option-card.has-time-summary .route-time-summary-head {
+      display: block;
+    }
+    .route-option-card.selected .route-time-summary-body {
+      display: block;
+    }
+    .route-option-card .route-time-summary-head {
+      margin-bottom: 12px;
+    }
+    .route-option-card .route-time-total {
+      display: flex;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 4px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: #111827;
+    }
+    .route-option-card.has-time-summary .route-time-total {
+      padding-right: 128px;
+    }
+    .route-option-card .route-time-total-number {
+      font-size: 34px;
+      font-weight: 900;
+    }
+    .route-option-card .route-time-total-unit {
+      margin-right: 8px;
+      margin-bottom: 4px;
+      font-size: 17px;
+      font-weight: 500;
+      color: #4b5563;
+      letter-spacing: -0.02em;
+    }
+    .route-option-card .route-time-total-unit:last-child {
+      margin-right: 0;
+    }
+    .route-option-card .route-time-range {
+      margin-top: 7px;
+      font-size: 18px;
+      line-height: 1.25;
+      font-weight: 600;
+      color: #374151;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
     .route-option-card .route-detail {
       font-size: 13px;
       color: #666;
       line-height: 1.4;
-      margin-top: 6px;
+      margin-top: 12px;
     }
     .route-option-card .route-detail-default {
       display: block;
@@ -3468,52 +3538,25 @@
     .route-option-card.selected .route-detail-selected {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 7px;
     }
-    .route-option-card .route-step-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
+    .route-option-card .route-collapsed-flow {
+      display: block;
+      color: #5f6b7a;
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: normal;
     }
-    .route-option-card .route-step-name {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: #444;
+    .route-option-card .route-collapsed-point {
+      display: inline;
       font-weight: 600;
+      white-space: normal;
     }
-    .route-option-card .route-step-meta {
-      margin-left: auto;
-      text-align: right;
-      white-space: nowrap;
-      color: #1e5a8e;
-      font-size: 12px;
-      font-variant-numeric: tabular-nums;
-    }
-    .route-option-card .route-step-arrow {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      gap: 8px;
-      padding-left: 3.5ch;
-      color: #666;
-      font-size: 12px;
-      line-height: 1.2;
-    }
-    .route-option-card .route-step-arrow .arrow {
-      font-size: 14px;
+    .route-option-card .route-collapsed-arrow {
+      display: inline;
+      margin: 0 6px;
+      color: #8c96a7;
       font-weight: 700;
-      color: #333;
-    }
-    .route-option-card .route-step-distance {
-      color: #555;
-      font-weight: 600;
-    }
-    .route-option-card .route-step-mode {
-      color: #666;
-      font-weight: 500;
     }
     .route-option-card .card-main {
       display: flex;
@@ -3525,11 +3568,259 @@
       min-width: 0;
       cursor: pointer;
     }
+    .route-option-card.has-time-summary .route-name {
+      flex-wrap: nowrap;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .route-option-card.has-time-summary .route-name-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .route-option-card .route-card-actions {
       flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+    }
+    .route-option-card.has-time-summary .route-card-actions {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      z-index: 2;
+      align-items: flex-start;
+    }
+    .route-option-card .route-time-summary-body {
+      margin-top: 14px;
+    }
+    .route-option-card .route-time-summary-body:empty {
+      display: none !important;
+      margin-top: 0;
+    }
+    .route-option-card .route-time-bar {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      width: 100%;
+      padding-left: 14px;
+      overflow: visible;
+    }
+    .route-option-card .route-time-segment {
+      position: relative;
+      flex: var(--segment-flex, 1) 1 0;
+      min-width: 36px;
+      height: 16px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      white-space: nowrap;
+      overflow: visible;
+    }
+    .route-option-card .route-time-segment.is-edge-start {
+      border-radius: 999px 0 0 999px;
+    }
+    .route-option-card .route-time-segment.is-edge-end {
+      border-radius: 0 999px 999px 0;
+      padding-left: 14px;
+      padding-right: 6px;
+    }
+    .route-option-card .route-time-segment.is-edge-start.is-edge-end {
+      border-radius: 999px;
+    }
+    .route-option-card .route-time-segment.is-walk {
+      background: #d6dde7;
+      color: #475569;
+    }
+    .route-option-card .route-time-segment.is-bus {
+      background: #1f78ff;
+      color: #fff;
+    }
+    .route-option-card .route-time-segment-badge {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      transform: translate(-14px, -50%);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 15px 15px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+    }
+    .route-option-card .route-time-segment-badge.walk {
+      background-color: #eef2f6;
+      background-image: url('walk_icon.png');
+    }
+    .route-option-card .route-time-segment-badge.bus {
+      background-color: #1f78ff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='4.5' width='14' height='12.5' rx='3'/%3E%3Cpath d='M8 8.5h8'/%3E%3Cpath d='M7.5 12.5h9'/%3E%3Cpath d='M8.5 17v1.5'/%3E%3Cpath d='M15.5 17v1.5'/%3E%3Ccircle cx='9' cy='18.5' r='1' fill='%23ffffff' stroke='none'/%3E%3Ccircle cx='15' cy='18.5' r='1' fill='%23ffffff' stroke='none'/%3E%3C/svg%3E");
+    }
+    .route-option-card .route-time-segment-label {
+      position: relative;
+      z-index: 1;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .route-option-card .route-time-segment-label.is-empty {
+      opacity: 0;
+    }
+    .route-option-card .route-timeline-flow {
+      --route-timeline-time-width: 48px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .route-option-card .route-timeline-point {
+      display: grid;
+      align-items: start;
+      column-gap: 10px;
+      min-width: 0;
+      grid-template-columns: 18px minmax(0, 1fr) auto;
+    }
+    .route-option-card .route-timeline-point.has-time {
+      grid-template-columns: 18px var(--route-timeline-time-width) minmax(0, 1fr) auto;
+    }
+    .route-option-card .route-time-point-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      align-self: start;
+      justify-self: center;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    .route-option-card .route-time-point-icon.start {
+      background-image: url('start_icon.png');
+    }
+    .route-option-card .route-time-point-icon.stop {
+      background-image: url('stop_icon.png');
+    }
+    .route-option-card .route-time-point-icon.arrive {
+      background-image: url('arrive_icon.png');
+    }
+    .route-option-card .route-timeline-point-time {
+      width: 48px;
+      flex-shrink: 0;
+      grid-column: 2;
+      align-self: start;
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      font-variant-numeric: tabular-nums;
+    }
+    .route-option-card .route-timeline-point-time.is-empty {
+      color: transparent;
+    }
+    .route-option-card .route-timeline-point-name {
+      min-width: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      white-space: normal;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .route-option-card .route-timeline-point-label {
+      min-width: 0;
+      display: block;
+      align-self: start;
+      line-height: 1.38;
+      padding-right: 8px;
+      padding-left: 0.75em;
+      text-indent: -0.75em;
+    }
+    .route-option-card .route-timeline-point.has-time .route-timeline-point-label {
+      grid-column: 3;
+    }
+    .route-option-card .route-timeline-point.no-time .route-timeline-point-label {
+      grid-column: 2;
+    }
+    .route-option-card .route-timeline-point-role {
+      align-self: start;
+      justify-self: end;
+      text-align: right;
+      padding-top: 1px;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 700;
+      color: #6b7280;
+      letter-spacing: -0.01em;
+    }
+    .route-option-card .route-timeline-point.has-time .route-timeline-point-role {
+      grid-column: 4;
+    }
+    .route-option-card .route-timeline-point.no-time .route-timeline-point-role {
+      grid-column: 3;
+    }
+    .route-option-card .route-timeline-connector {
+      display: grid;
+      align-items: center;
+      column-gap: 6px;
+      grid-template-columns: 18px minmax(0, 1fr);
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.35;
+      min-width: 0;
+      min-height: 38px;
+    }
+    .route-option-card .route-timeline-connector-marker {
+      width: 18px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      justify-self: center;
+      align-self: stretch;
+      min-height: 38px;
+      padding: 2px 0;
+    }
+    .route-option-card .route-timeline-connector-marker-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.88;
+    }
+    .route-option-card .route-timeline-connector-marker.is-bus {
+      color: #1f78ff;
+    }
+    .route-option-card .route-timeline-connector-marker.is-walk {
+      color: #a2acb8;
+    }
+    .route-option-card .route-timeline-connector-text.is-bus {
+      color: #1f78ff;
+      font-weight: 700;
+    }
+    .route-option-card .route-timeline-connector-text.is-walk {
+      color: #6b7280;
+      font-weight: 600;
+    }
+    .route-option-card .route-timeline-connector-text {
+      min-width: 0;
+      white-space: normal;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      line-height: 1.38;
+      padding-left: 0.75em;
+      text-indent: -0.75em;
+    }
+    .route-option-card .route-timeline-note {
+      margin-top: 2px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #888;
+      text-align: right;
     }
     .route-option-card .btn-route-detail {
       flex-shrink: 0;
@@ -3758,6 +4049,33 @@
       .route-option-card .route-card-actions {
         flex-wrap: wrap;
         justify-content: flex-end;
+      }
+      .route-option-card.has-time-summary .route-card-actions {
+        top: 12px;
+        right: 14px;
+        gap: 4px;
+      }
+      .route-option-card.has-time-summary .route-time-total {
+        padding-right: 112px;
+      }
+      .route-option-card .route-time-total-number {
+        font-size: 30px;
+      }
+      .route-option-card .route-time-total-unit {
+        font-size: 15px;
+      }
+      .route-option-card .route-time-range {
+        font-size: 16px;
+      }
+      .route-option-card .route-time-segment {
+        min-width: 54px;
+      }
+      .route-option-card .route-time-segment-label {
+        font-size: 10px;
+      }
+      .route-option-card .route-timeline-point-time,
+      .route-option-card .route-timeline-point-name {
+        font-size: 13px;
       }
     }
     .route-detail-panel {
@@ -6816,8 +7134,15 @@
       var walkOtpEnabled = true;
       var walkPathCache = new Map();
       var walkPathPending = new Map();
+      var routeVariantDetailCache = new Map();
+      var routeVariantDetailPending = new Map();
+      var routeTimeSummaryPrefetchTimers = [];
+      var routeCardRenderTokenSeq = 0;
       var walkOtpTimeoutBackoffStep = 0;
       var walkOtpTimeoutSkipUntilMs = 0;
+      var ROUTE_VARIANT_DETAIL_CACHE_LIMIT = 256;
+      var ROUTE_TIME_SUMMARY_PREFETCH_LIMIT = 3;
+      var ROUTE_TIME_SUMMARY_PREFETCH_DELAY_MS = 180;
       var ROUTE_ARROW_REFRESH_DEBOUNCE_MS = 120;
       var routeArrowRefreshTimer = null;
       var currentLocationOverlayRefreshRaf = 0;
@@ -8741,7 +9066,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         if (endpointOptionsAll.length === 0) return false;
         if (setRef.size !== endpointOptionsAll.length) return false;
         for (var i = 0; i < endpointOptionsAll.length; i++) {
-          if (!setRef.has(endpointOptionsAll[i].endpoint_name)) return false;
+          if (!setRef.has(getEndpointOptionKey(endpointOptionsAll[i]))) return false;
         }
         return true;
       }
@@ -8757,11 +9082,18 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return ok;
       }
 
+      function getEndpointOptionKey(opt) {
+        if (!opt || typeof opt !== 'object') return '';
+        var groupId = String(opt.endpoint_group_id || '').trim();
+        if (groupId) return groupId;
+        return String(opt.endpoint_name || '').trim();
+      }
+
       function getSelectedEndpointRouteCount() {
         if (endpointOptionsAll.length === 0 || selectedEndpoints.size === 0) return 0;
         var sum = 0;
         endpointOptionsAll.forEach(function(opt) {
-          if (selectedEndpoints.has(opt.endpoint_name)) {
+          if (selectedEndpoints.has(getEndpointOptionKey(opt))) {
             sum += (opt.route_count || 0);
           }
         });
@@ -8770,8 +9102,14 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function getSelectedEndpointNamesSorted() {
         var names = [];
-        selectedEndpoints.forEach(function(name) { names.push(name); });
-        names.sort(function(a, b) { return a.localeCompare(b, 'ko'); });
+        endpointOptionsAll.forEach(function(opt) {
+          var key = getEndpointOptionKey(opt);
+          if (!key || !selectedEndpoints.has(key)) return;
+          names.push(key);
+        });
+        selectedEndpoints.forEach(function(name) {
+          if (names.indexOf(name) === -1) names.push(name);
+        });
         return names;
       }
 
@@ -8916,7 +9254,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         if (endpointOptionsAll.length === 0) return '선택 옵션 없음';
         if (selectedEndpoints.size === 0) return '선택 없음';
         var selectedOptions = endpointOptionsAll.filter(function(opt) {
-          return selectedEndpoints.has(opt.endpoint_name);
+          return selectedEndpoints.has(getEndpointOptionKey(opt));
         });
         if (selectedOptions.length === 0) return '선택 없음';
         selectedOptions.sort(function(a, b) {
@@ -8980,6 +9318,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function getEndpointOptionSearchText(opt) {
         var parts = [];
+        var sectionName = String((opt && opt.endpoint_section_name) || '').trim();
+        if (sectionName) parts.push(sectionName);
         var primary = String((opt && opt.endpoint_primary_name) || '').trim();
         if (primary) parts.push(primary);
         if (opt && Array.isArray(opt.endpoint_components) && opt.endpoint_components.length > 0) {
@@ -8997,10 +9337,12 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function mapEndpointOption(item) {
         var mapped = {
+          endpoint_group_id: String(item.endpoint_group_id || ''),
           endpoint_name: String(item.endpoint_name || ''),
           route_count: Number(item.route_count || 0),
           endpoint_primary_name: String(item.endpoint_primary_name || ''),
           endpoint_display_name: String(item.endpoint_display_name || ''),
+          endpoint_section_name: String(item.endpoint_section_name || ''),
           endpoint_components: Array.isArray(item.endpoint_components)
             ? item.endpoint_components
                 .map(function(name) { return String(name || '').trim(); })
@@ -9015,18 +9357,22 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function buildSharedEndpointOptionSummary(raw) {
         if (raw && typeof raw === 'object') {
           return mapEndpointOption({
+            endpoint_group_id: String(raw.endpoint_group_id || ''),
             endpoint_name: String(raw.endpoint_name || ''),
             route_count: Number(raw.route_count || 0),
             endpoint_primary_name: String(raw.endpoint_primary_name || ''),
             endpoint_display_name: String(raw.endpoint_display_name || ''),
+            endpoint_section_name: String(raw.endpoint_section_name || ''),
             endpoint_components: Array.isArray(raw.endpoint_components) ? raw.endpoint_components : []
           });
         }
         return mapEndpointOption({
+          endpoint_group_id: '',
           endpoint_name: String(raw || ''),
           route_count: 0,
           endpoint_primary_name: String(raw || ''),
           endpoint_display_name: String(raw || ''),
+          endpoint_section_name: '',
           endpoint_components: [String(raw || '')]
         });
       }
@@ -9034,13 +9380,15 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function getSelectedEndpointOptionSummaries() {
         if (!endpointOptionsAll.length || !selectedEndpoints.size) return [];
         return endpointOptionsAll
-          .filter(function(opt) { return selectedEndpoints.has(opt.endpoint_name); })
+          .filter(function(opt) { return selectedEndpoints.has(getEndpointOptionKey(opt)); })
           .map(function(opt) {
             return {
+              endpoint_group_id: String(opt.endpoint_group_id || ''),
               endpoint_name: String(opt.endpoint_name || ''),
               route_count: Number(opt.route_count || 0),
               endpoint_primary_name: String(opt.endpoint_primary_name || ''),
               endpoint_display_name: String(opt.endpoint_display_name || ''),
+              endpoint_section_name: String(opt.endpoint_section_name || ''),
               endpoint_components: Array.isArray(opt.endpoint_components)
                 ? opt.endpoint_components.slice()
                 : []
@@ -9061,7 +9409,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           : [];
         endpointSummaries.forEach(function(item) {
           var mapped = buildSharedEndpointOptionSummary(item);
-          if (!mapped.endpoint_name) return;
+          if (!getEndpointOptionKey(mapped) && !mapped.endpoint_name) return;
           endpointOptionsAll.push(mapped);
         });
 
@@ -9074,7 +9422,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         });
 
         if (selectedEndpoints.size === 0 && endpointOptionsAll.length > 0) {
-          endpointOptionsAll.forEach(function(opt) { selectedEndpoints.add(opt.endpoint_name); });
+          endpointOptionsAll.forEach(function(opt) {
+            var key = getEndpointOptionKey(opt);
+            if (key) selectedEndpoints.add(key);
+          });
         }
         endpointOptions = endpointOptionsAll.slice();
         persistCurrentEndpointSelection({ saveRemote: false });
@@ -9244,7 +9595,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             endpointDraftEndpoints = new Set();
           } else {
             var all = new Set();
-            endpointOptionsAll.forEach(function(opt) { all.add(opt.endpoint_name); });
+            endpointOptionsAll.forEach(function(opt) {
+              var key = getEndpointOptionKey(opt);
+              if (key) all.add(key);
+            });
             endpointDraftEndpoints = all;
           }
           renderEndpointPickerList();
@@ -9268,8 +9622,21 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           return;
         }
 
+        var lastSectionName = null;
         endpointOptions.forEach(function(opt) {
-          var selected = activeSelection.has(opt.endpoint_name);
+          var sectionName = String(opt.endpoint_section_name || '').trim();
+          if (sectionName !== lastSectionName) {
+            lastSectionName = sectionName;
+            var sectionHeader = document.createElement('div');
+            sectionHeader.className = 'endpoint-picker-section-header';
+            sectionHeader.innerHTML =
+              '<span class="endpoint-picker-section-title">' + escapeHtml(sectionName || '사업장 외') + '</span>' +
+              '<span class="endpoint-picker-section-divider"></span>';
+            endpointPickerList.appendChild(sectionHeader);
+          }
+
+          var optionKey = getEndpointOptionKey(opt);
+          var selected = activeSelection.has(optionKey);
           var btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'endpoint-picker-item' + (selected ? ' selected' : '');
@@ -9284,8 +9651,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             '<span class="endpoint-item-meta">' + (opt.route_count || 0) + '</span>';
           btn.addEventListener('click', function() {
             if (!endpointDraftEndpoints) endpointDraftEndpoints = cloneStringSet(activeSelection);
-            if (endpointDraftEndpoints.has(opt.endpoint_name)) endpointDraftEndpoints.delete(opt.endpoint_name);
-            else endpointDraftEndpoints.add(opt.endpoint_name);
+            if (endpointDraftEndpoints.has(optionKey)) endpointDraftEndpoints.delete(optionKey);
+            else if (optionKey) endpointDraftEndpoints.add(optionKey);
             renderEndpointPickerList();
           });
           endpointPickerList.appendChild(btn);
@@ -9486,11 +9853,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
             endpointOptionsAll = rawOptions
               .map(mapEndpointOption)
-              .filter(function(item) { return item.endpoint_name.length > 0; })
-              .sort(function(a, b) { return a.endpoint_name.localeCompare(b.endpoint_name, 'ko'); });
+              .filter(function(item) { return getEndpointOptionKey(item).length > 0 || item.endpoint_name.length > 0; });
             resetEndpointSearch();
 
-            var available = new Set(endpointOptionsAll.map(function(item) { return item.endpoint_name; }));
+            var available = new Set(endpointOptionsAll.map(function(item) { return getEndpointOptionKey(item); }));
             var nextSelected = new Set();
             if (Array.isArray(selectedNames) && selectedNames.length > 0) {
               selectedNames.forEach(function(name) {
@@ -9499,7 +9865,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               });
             }
             if (nextSelected.size === 0) {
-              endpointOptionsAll.forEach(function(item) { nextSelected.add(item.endpoint_name); });
+              endpointOptionsAll.forEach(function(item) {
+                var key = getEndpointOptionKey(item);
+                if (key) nextSelected.add(key);
+              });
             }
             selectedEndpoints = nextSelected;
             endpointDraftEndpoints = null;
@@ -12979,6 +13348,739 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         };
       }
 
+      function clearRouteTimeSummaryPrefetchTimers() {
+        routeTimeSummaryPrefetchTimers.forEach(function(timerId) {
+          clearTimeout(timerId);
+        });
+        routeTimeSummaryPrefetchTimers = [];
+      }
+
+      function getOptionDisplayDepartureTime(option) {
+        var timeText = String(
+          option && (
+            option.__activeDetailTime ||
+            option.__originBoardTime ||
+            option.board_time ||
+            ''
+          ) || ''
+        ).trim();
+        return timeText || getDepartureTimeStr();
+      }
+
+      function buildRouteMetaLineText(option, isDepart) {
+        var timeStr = getOptionDisplayDepartureTime(option);
+        var serviceLabel = getRouteServiceLabel(option && option.route_type, isDepart);
+        return formatDistance(option && option.distance_m) + ' · ' + timeStr + ' ' + serviceLabel + ' 노선';
+      }
+
+      function syncRouteCardMeta(card, option, isDepart) {
+        if (!card) return;
+        var metaNode = card.querySelector('.route-meta');
+        if (!metaNode) return;
+        metaNode.textContent = buildRouteMetaLineText(option, isDepart);
+      }
+
+      function buildRouteVariantDetailCacheKey(routeId, dayType, departureTime) {
+        return [
+          String(routeId || '').trim(),
+          String(dayType || '').trim() || 'weekday',
+          String(departureTime || '').trim()
+        ].join('|');
+      }
+
+      function setRouteVariantDetailCache(key, value) {
+        if (!key) return;
+        routeVariantDetailCache.set(key, cloneJsonValue(value));
+        if (routeVariantDetailCache.size > ROUTE_VARIANT_DETAIL_CACHE_LIMIT) {
+          var oldestKey = routeVariantDetailCache.keys().next().value;
+          if (oldestKey != null) routeVariantDetailCache.delete(oldestKey);
+        }
+      }
+
+      function getRouteVariantDetailCache(key) {
+        if (!key || !routeVariantDetailCache.has(key)) return null;
+        return cloneJsonValue(routeVariantDetailCache.get(key));
+      }
+
+      function fetchRouteVariantDetailData(routeId, departureTime) {
+        var timeText = String(departureTime || '').trim() || getDepartureTimeStr();
+        var cacheKey = buildRouteVariantDetailCacheKey(routeId, selectedDayType, timeText);
+        var cached = getRouteVariantDetailCache(cacheKey);
+        if (cached) return Promise.resolve(cached);
+        if (routeVariantDetailPending.has(cacheKey)) {
+          return routeVariantDetailPending.get(cacheKey).then(function(value) {
+            return cloneJsonValue(value);
+          });
+        }
+        var pending = fetchJson(
+          API_BASE + '/api/route/' + encodeURIComponent(String(routeId)) + '/variant-detail' +
+          '?day_type=' + encodeURIComponent(selectedDayType) +
+          '&departure_time=' + encodeURIComponent(timeText)
+        )
+          .then(function(result) {
+            if (!result.ok) {
+              throw new Error(result.data && result.data.error || '노선 상세를 불러오지 못했습니다.');
+            }
+            var detail = cloneJsonValue(result.data || {}) || {};
+            setRouteVariantDetailCache(cacheKey, detail);
+            return detail;
+          })
+          .finally(function() {
+            routeVariantDetailPending.delete(cacheKey);
+          });
+        routeVariantDetailPending.set(cacheKey, pending);
+        return pending.then(function(value) {
+          return cloneJsonValue(value);
+        });
+      }
+
+      function getOptionExistingVariantDetail(option, departureTime) {
+        if (!option) return null;
+        var timeText = String(departureTime || '').trim();
+        if (!timeText) return null;
+        if (option.__sharedVariantDetail && option.__sharedVariantHydrated) {
+          var sharedTime = String(option.__sharedVariantDetail.selected_departure_time || '').trim();
+          if (!sharedTime || sharedTime === timeText) {
+            return cloneJsonValue(option.__sharedVariantDetail);
+          }
+        }
+        var activeTime = String(option.__activeDetailTime || option.__originBoardTime || option.board_time || '').trim();
+        if (activeTime === timeText && routeStopsHaveVariantDetail(option.route_stops || [])) {
+          return {
+            selected_departure_time: activeTime,
+            route_stops: cloneJsonValue(option.route_stops || []),
+            selected_operator: String(option.operator || '')
+          };
+        }
+        return null;
+      }
+
+      function getRouteTimeSummaryStore(option) {
+        if (!option || typeof option !== 'object') return {};
+        if (!option.__timeSummaryByDepartureTime || typeof option.__timeSummaryByDepartureTime !== 'object') {
+          option.__timeSummaryByDepartureTime = {};
+        }
+        return option.__timeSummaryByDepartureTime;
+      }
+
+      function getRouteTimeSummaryEntry(option, departureTime) {
+        var key = String(departureTime || '').trim();
+        if (!key) return null;
+        var store = getRouteTimeSummaryStore(option);
+        return store[key] || null;
+      }
+
+      function setRouteTimeSummaryEntry(option, departureTime, entry) {
+        var key = String(departureTime || '').trim();
+        if (!key) return;
+        var store = getRouteTimeSummaryStore(option);
+        store[key] = entry;
+      }
+
+      function clearRouteTimeSummaryEntry(option, departureTime) {
+        var key = String(departureTime || '').trim();
+        if (!key) return;
+        var store = getRouteTimeSummaryStore(option);
+        delete store[key];
+      }
+
+      function findRouteStopForSummary(routeStops, sequence, name, fallbackMode) {
+        var rows = Array.isArray(routeStops) ? routeStops : [];
+        if (!rows.length) return null;
+        var sequenceKey = normalizeStopSequence(sequence);
+        if (sequenceKey) {
+          for (var i = 0; i < rows.length; i += 1) {
+            if (normalizeStopSequence(rows[i] && rows[i].sequence) === sequenceKey) {
+              return rows[i];
+            }
+          }
+        }
+        var nameKey = normalizeStopName(name);
+        if (nameKey) {
+          if (fallbackMode === 'last') {
+            for (var j = rows.length - 1; j >= 0; j -= 1) {
+              if (normalizeStopName(rows[j] && rows[j].stop_name) === nameKey) {
+                return rows[j];
+              }
+            }
+          } else {
+            for (var k = 0; k < rows.length; k += 1) {
+              if (normalizeStopName(rows[k] && rows[k].stop_name) === nameKey) {
+                return rows[k];
+              }
+            }
+          }
+        }
+        if (fallbackMode === 'first') return rows[0];
+        if (fallbackMode === 'last') return rows[rows.length - 1];
+        return null;
+      }
+
+      function getForwardClockDiffMinutes(startTime, endTime) {
+        var startMinutes = parseHHMMToMinutes(startTime);
+        var endMinutes = parseHHMMToMinutes(endTime);
+        if (startMinutes == null || endMinutes == null) return null;
+        var diff = endMinutes - startMinutes;
+        while (diff < 0) diff += 24 * 60;
+        return diff;
+      }
+
+      function formatRouteTotalDuration(totalMinutes) {
+        var value = Math.max(0, Math.round(Number(totalMinutes) || 0));
+        var hours = Math.floor(value / 60);
+        var minutes = value % 60;
+        if (hours > 0) return String(hours) + '시간 ' + String(minutes) + '분';
+        return String(minutes) + '분';
+      }
+
+      function formatRouteTotalDurationHtml(totalMinutes) {
+        var value = Math.max(0, Math.round(Number(totalMinutes) || 0));
+        var hours = Math.floor(value / 60);
+        var minutes = value % 60;
+        var htmlParts = [];
+        if (hours > 0) {
+          htmlParts.push(
+            '<span class="route-time-total-number">' + escapeHtml(String(hours)) + '</span>' +
+            '<span class="route-time-total-unit">시간</span>'
+          );
+        }
+        htmlParts.push(
+          '<span class="route-time-total-number">' + escapeHtml(String(minutes)) + '</span>' +
+          '<span class="route-time-total-unit">분</span>'
+        );
+        return htmlParts.join('');
+      }
+
+      function formatRouteMeridiemTime(hhmm) {
+        var minutes = parseHHMMToMinutes(hhmm);
+        if (minutes == null) return '';
+        var hour24 = Math.floor(minutes / 60);
+        var minute = minutes % 60;
+        var meridiem = hour24 < 12 ? '오전' : '오후';
+        var hour12 = hour24 % 12;
+        if (hour12 === 0) hour12 = 12;
+        return meridiem + ' ' + String(hour12) + ':' + String(minute).padStart(2, '0');
+      }
+
+      function normalizeAdminRegionToken(token) {
+        var text = String(token || '').trim();
+        var aliases = {
+          '서울': '서울시',
+          '부산': '부산시',
+          '대구': '대구시',
+          '인천': '인천시',
+          '광주': '광주시',
+          '대전': '대전시',
+          '울산': '울산시',
+          '세종': '세종시',
+          '경기': '경기도',
+          '강원': '강원도',
+          '충북': '충청북도',
+          '충남': '충청남도',
+          '전북': '전라북도',
+          '전남': '전라남도',
+          '경북': '경상북도',
+          '경남': '경상남도',
+          '제주': '제주도'
+        };
+        return aliases[text] || text;
+      }
+
+      function extractTwoLevelAdminLabel(addressName) {
+        var text = String(addressName || '').trim();
+        if (!text) return '';
+        var parts = text.split(/\s+/).filter(Boolean);
+        if (!parts.length) return '';
+        var first = normalizeAdminRegionToken(parts[0]);
+        var second = '';
+        for (var i = 1; i < parts.length; i += 1) {
+          var token = String(parts[i] || '').trim();
+          if (!token) continue;
+          if (
+            /[군구시]$/.test(token) ||
+            /특별자치시$/.test(token) ||
+            /특별자치도$/.test(token)
+          ) {
+            second = token;
+            break;
+          }
+        }
+        if (!second && parts.length > 1) second = String(parts[1] || '').trim();
+        if (!second || second === first) return first;
+        return first + ' ' + second;
+      }
+
+      function formatRouteDisplayPlaceName(placeName, addressName) {
+        var baseName = String(placeName || '선택한 위치').trim() || '선택한 위치';
+        if (baseName !== '선택한 위치') return baseName;
+        var region = extractTwoLevelAdminLabel(addressName);
+        if (!region) return baseName;
+        return baseName + ' (' + region + ')';
+      }
+
+      function getRouteDisplayPlaceName(placeName) {
+        return formatRouteDisplayPlaceName(placeName, lastPlace && lastPlace.address_name);
+      }
+
+      function formatRouteSegmentDuration(totalMinutes) {
+        var value = Math.max(1, Math.round(Number(totalMinutes) || 0));
+        return String(value) + '분';
+      }
+
+      function getWalkMinutesForSummary(walkInfo) {
+        if (!isSuccessfulWalkPathResult(walkInfo)) return null;
+        var durationSec = Number(walkInfo && walkInfo.duration_sec);
+        if (!isFinite(durationSec) || durationSec <= 0) return null;
+        return Math.max(1, Math.round(durationSec / 60));
+      }
+
+      function resolveRouteSummaryStops(routeStops, option, isDepart) {
+        var rows = Array.isArray(routeStops) ? routeStops : [];
+        var boardStop = isDepart
+          ? findRouteStopForSummary(rows, option.nearest_stop_sequence, option.nearest_stop_name, null)
+          : findRouteStopForSummary(rows, option.start_stop_sequence, option.start_stop_name, 'first');
+        var alightStop = isDepart
+          ? findRouteStopForSummary(rows, option.terminus_sequence, option.terminus_name, 'last')
+          : findRouteStopForSummary(rows, option.getoff_stop_sequence, option.getoff_stop_name, null);
+        return {
+          boardStop: boardStop,
+          alightStop: alightStop,
+          boardName: String(
+            (boardStop && boardStop.stop_name) ||
+            (isDepart ? option.nearest_stop_name : option.start_stop_name) ||
+            '탑승 정류장'
+          ),
+          alightName: String(
+            (alightStop && alightStop.stop_name) ||
+            (isDepart ? option.terminus_name : option.getoff_stop_name) ||
+            '하차 정류장'
+          )
+        };
+      }
+
+      function estimateRouteBusDurationMinutes(routeStops, option, isDepart, resolvedStops) {
+        var rows = Array.isArray(routeStops) ? routeStops : [];
+        var boardStop = resolvedStops && resolvedStops.boardStop;
+        var alightStop = resolvedStops && resolvedStops.alightStop;
+        var boardElapsed = Number(boardStop && boardStop.estimated_elapsed_min);
+        var alightElapsed = Number(alightStop && alightStop.estimated_elapsed_min);
+        if (isFinite(boardElapsed) && isFinite(alightElapsed) && alightElapsed > boardElapsed) {
+          return Math.max(1, Math.round(alightElapsed - boardElapsed));
+        }
+        var boardSeq = Number(
+          (boardStop && boardStop.sequence) ||
+          (isDepart ? option.nearest_stop_sequence : option.start_stop_sequence)
+        );
+        var alightSeq = Number(
+          (alightStop && alightStop.sequence) ||
+          (isDepart ? option.terminus_sequence : option.getoff_stop_sequence)
+        );
+        if (isFinite(boardSeq) && isFinite(alightSeq) && alightSeq > boardSeq) {
+          return Math.max(6, Math.round((alightSeq - boardSeq) * 4));
+        }
+        if (rows.length > 1) {
+          return Math.max(6, Math.round((rows.length - 1) * 3));
+        }
+        return 12;
+      }
+
+      function getRouteDisplayWalkInfo(option, isDepart) {
+        if (option && option.__selectedWalkInfo) {
+          return cloneJsonValue(option.__selectedWalkInfo);
+        }
+        var leg = getOptionWalkLegPositions(option && option.positions || [], isDepart);
+        if (leg) {
+          var cacheKey = buildWalkPathCacheKey(leg.fromPos, leg.toPos);
+          if (cacheKey && walkPathCache.has(cacheKey)) {
+            return cloneJsonValue(walkPathCache.get(cacheKey));
+          }
+        }
+        return buildStraightLineFallbackWalkInfo(option && option.positions || [], isDepart, 'card_preview');
+      }
+
+      function buildRouteTimelineSegments(isDepart, walkMinutes, busMinutes, showLabels) {
+        var walkValue = Math.max(1, Math.round(Number(walkMinutes) || 0) || 6);
+        var busValue = Math.max(1, Math.round(Number(busMinutes) || 0) || 12);
+        var walkSegment = {
+          kind: 'walk',
+          duration_min: walkValue,
+          flex_value: walkValue,
+          label_text: showLabels ? formatRouteSegmentDuration(walkValue) : ''
+        };
+        var busSegment = {
+          kind: 'bus',
+          duration_min: busValue,
+          flex_value: busValue,
+          label_text: showLabels ? formatRouteSegmentDuration(busValue) : ''
+        };
+        return isDepart ? [walkSegment, busSegment] : [busSegment, walkSegment];
+      }
+
+      function buildWalkConnectorText(option, isDepart, walkInfo) {
+        var fallbackInfo = walkInfo || buildStraightLineFallbackWalkInfo(option && option.positions || [], isDepart, 'card_preview');
+        var distanceM = Number(fallbackInfo && fallbackInfo.distance_m);
+        var durationSec = Number(fallbackInfo && fallbackInfo.duration_sec);
+        var distanceText = isFinite(distanceM) && distanceM > 0 ? formatDistance(distanceM) : '';
+        var durationText = (isFinite(durationSec) && durationSec > 0)
+          ? (String(Math.max(1, Math.round(durationSec / 60))) + '분')
+          : '';
+        var text = '도보';
+        if (durationText) text += ' ' + durationText;
+        if (distanceText) {
+          text += durationText ? (' · ' + distanceText) : (' ' + distanceText);
+        }
+        if (fallbackInfo && fallbackInfo.fallback_type === 'straight_line' && distanceText) {
+          text += ' (직선거리)';
+        }
+        return text;
+      }
+
+      function buildBusConnectorText(routeLabel, busMinutes) {
+        var nameText = String(routeLabel || '').trim() || '이동 노선';
+        var durationText = formatRouteTotalDuration(busMinutes);
+        return '셔틀 ' + durationText + ' · ' + nameText;
+      }
+
+      function buildRouteTimelinePreviewData(option, placeName, isDepart, detail, walkInfo) {
+        option = option || {};
+        var routeStops = Array.isArray(detail && detail.route_stops)
+          ? detail.route_stops
+          : (Array.isArray(option.route_stops) ? option.route_stops : []);
+        var resolvedStops = resolveRouteSummaryStops(routeStops, option, isDepart);
+        var walkMinutes = getWalkMinutesForSummary(walkInfo);
+        if (walkMinutes == null) {
+          var straightWalk = buildStraightWalkInfo(option.positions || [], isDepart);
+          var straightDurationSec = Number(straightWalk && straightWalk.duration_sec);
+          if (isFinite(straightDurationSec) && straightDurationSec > 0) {
+            walkMinutes = Math.max(1, Math.round(straightDurationSec / 60));
+          }
+        }
+        var busMinutes = estimateRouteBusDurationMinutes(routeStops, option, isDepart, resolvedStops);
+        var routeLabel = String(option.route_name || '').trim() || '이동 노선';
+        var displayPlaceName = getRouteDisplayPlaceName(placeName);
+        return {
+          has_eta: false,
+          departure_time: getOptionDisplayDepartureTime(option),
+          start_at: '',
+          end_at: '',
+          board_at: '',
+          alight_at: '',
+          total_minutes: null,
+          total_text: '',
+          total_html: '',
+          range_text: '',
+          range_display: '',
+          segments: buildRouteTimelineSegments(isDepart, walkMinutes, busMinutes, false),
+          points: isDepart
+            ? [
+                { icon: 'start', time: '', name: displayPlaceName, role: '' },
+                { icon: 'stop', time: '', name: resolvedStops.boardName, role: '탑승' },
+                { icon: 'arrive', time: '', name: resolvedStops.alightName, role: '하차' }
+              ]
+            : [
+                { icon: 'start', time: '', name: resolvedStops.boardName, role: '탑승' },
+                { icon: 'stop', time: '', name: resolvedStops.alightName, role: '하차' },
+                { icon: 'arrive', time: '', name: displayPlaceName, role: '' }
+              ],
+          connectors: isDepart
+            ? [
+                { kind: 'walk', text: buildWalkConnectorText(option, isDepart, walkInfo) },
+                { kind: 'bus', text: '셔틀 ' + routeLabel }
+              ]
+            : [
+                { kind: 'bus', text: '셔틀 ' + routeLabel },
+                { kind: 'walk', text: buildWalkConnectorText(option, isDepart, walkInfo) }
+              ]
+        };
+      }
+
+      function buildRouteTimeSummaryData(option, placeName, isDepart, departureTime, detail, walkInfo) {
+        var routeStops = Array.isArray(detail && detail.route_stops) ? detail.route_stops : [];
+        if (!routeStops.length) return null;
+        var walkMinutes = getWalkMinutesForSummary(walkInfo);
+        if (walkMinutes == null) return null;
+
+        var resolvedStops = resolveRouteSummaryStops(routeStops, option, isDepart);
+        var boardStop = resolvedStops.boardStop;
+        var alightStop = resolvedStops.alightStop;
+        if (!boardStop || !alightStop) return null;
+        if (!boardStop.eta_has_evidence || !alightStop.eta_has_evidence) return null;
+
+        var boardAt = String(boardStop.eta_time || boardStop.eta_display || '').trim();
+        var alightAt = String(alightStop.eta_time || alightStop.eta_display || '').trim();
+        if (!boardAt || !alightAt) return null;
+        var busMinutes = getForwardClockDiffMinutes(boardAt, alightAt);
+        if (busMinutes == null || busMinutes <= 0) return null;
+
+        var startAt = isDepart ? addClockMinutes(boardAt, -walkMinutes) : boardAt;
+        var endAt = isDepart ? alightAt : addClockMinutes(alightAt, walkMinutes);
+        if (!startAt || !endAt) return null;
+
+        var totalMinutes = walkMinutes + busMinutes;
+        var displayPlaceName = getRouteDisplayPlaceName(placeName);
+        var routeLabel = String(option && option.route_name || '').trim() || '이동 노선';
+        return {
+          has_eta: true,
+          departure_time: String(detail && detail.selected_departure_time || departureTime || '').trim() || getOptionDisplayDepartureTime(option),
+          start_at: startAt,
+          end_at: endAt,
+          board_at: boardAt,
+          alight_at: alightAt,
+          total_minutes: totalMinutes,
+          total_text: formatRouteTotalDuration(totalMinutes),
+          total_html: formatRouteTotalDurationHtml(totalMinutes),
+          range_text: startAt + ' - ' + endAt,
+          range_display: formatRouteMeridiemTime(startAt) + ' - ' + formatRouteMeridiemTime(endAt),
+          segments: buildRouteTimelineSegments(isDepart, walkMinutes, busMinutes, true),
+          points: isDepart
+            ? [
+                { icon: 'start', time: startAt, name: displayPlaceName, role: '' },
+                { icon: 'stop', time: boardAt, name: resolvedStops.boardName, role: '탑승' },
+                { icon: 'arrive', time: alightAt, name: resolvedStops.alightName, role: '하차' }
+              ]
+            : [
+                { icon: 'start', time: boardAt, name: resolvedStops.boardName, role: '탑승' },
+                { icon: 'stop', time: alightAt, name: resolvedStops.alightName, role: '하차' },
+                { icon: 'arrive', time: endAt, name: displayPlaceName, role: '' }
+              ],
+          connectors: isDepart
+            ? [
+                { kind: 'walk', text: buildWalkConnectorText(option, isDepart, walkInfo) },
+                { kind: 'bus', text: buildBusConnectorText(routeLabel, busMinutes) }
+              ]
+            : [
+                { kind: 'bus', text: buildBusConnectorText(routeLabel, busMinutes) },
+                { kind: 'walk', text: buildWalkConnectorText(option, isDepart, walkInfo) }
+              ]
+        };
+      }
+
+      function buildRouteTimeSummaryHeadHtml(summary) {
+        if (!summary) return '';
+        return '' +
+          '<div class="route-time-total">' + String(summary.total_html || '') + '</div>' +
+          '<div class="route-time-range">' + escapeHtml(summary.range_display || summary.range_text || '') + '</div>';
+      }
+
+      function buildRouteTimeBarHtml(data) {
+        if (!data) return '';
+        var segmentsHtml = (data.segments || []).map(function(segment, index, list) {
+          var kind = String(segment.kind || '').trim() === 'walk' ? 'walk' : 'bus';
+          var flexValue = Math.max(1, Math.round(Number(segment.flex_value != null ? segment.flex_value : segment.duration_min) || 0));
+          var labelText = String(segment.label_text || '').trim();
+          var extraClasses = [];
+          if (index === 0) extraClasses.push('is-edge-start');
+          if (index === list.length - 1) extraClasses.push('is-edge-end');
+          return '' +
+            '<div class="route-time-segment is-' + kind + ' ' + extraClasses.join(' ') + '" style="--segment-flex:' + String(flexValue) + '">' +
+              '<span class="route-time-segment-badge ' + kind + '" aria-hidden="true"></span>' +
+              '<span class="route-time-segment-label' + (labelText ? '' : ' is-empty') + '">' + escapeHtml(labelText || '00분') + '</span>' +
+            '</div>';
+        }).join('');
+        return '<div class="route-time-bar">' + segmentsHtml + '</div>';
+      }
+
+      function buildRouteCollapsedDetailHtml(data) {
+        if (!data || !Array.isArray(data.points) || data.points.length < 3) return '';
+        return '' +
+          '<div class="route-collapsed-flow">' +
+            '<span class="route-collapsed-point">' + escapeHtml(String(data.points[0].name || '')) + '</span>' +
+            '<span class="route-collapsed-arrow">→</span>' +
+            '<span class="route-collapsed-point">' + escapeHtml(String(data.points[1].name || '')) + '</span>' +
+            '<span class="route-collapsed-arrow">→</span>' +
+            '<span class="route-collapsed-point">' + escapeHtml(String(data.points[2].name || '')) + '</span>' +
+          '</div>';
+      }
+
+      function buildRouteSelectedDetailHtml(data) {
+        if (!data || !Array.isArray(data.points) || data.points.length === 0) return '';
+        function buildConnectorMarkerHtml(kind) {
+          var connectorKind = String(kind || '').trim() === 'bus' ? 'bus' : 'walk';
+          return '' +
+            '<span class="route-timeline-connector-marker is-' + connectorKind + '" aria-hidden="true">' +
+              '<span class="route-timeline-connector-marker-dot"></span>' +
+              '<span class="route-timeline-connector-marker-dot"></span>' +
+              '<span class="route-timeline-connector-marker-dot"></span>' +
+              '<span class="route-timeline-connector-marker-dot"></span>' +
+            '</span>';
+        }
+        var html = '<div class="route-timeline-flow">';
+        (data.points || []).forEach(function(point, index) {
+          var icon = String(point.icon || '').trim();
+          if (icon !== 'start' && icon !== 'stop' && icon !== 'arrive') icon = 'stop';
+          var timeText = data.has_eta ? String(point.time || '').trim() : '';
+          var roleText = String(point.role || '').trim();
+          html += '' +
+            '<div class="route-timeline-point ' + (timeText ? 'has-time' : 'no-time') + '">' +
+              '<span class="route-time-point-icon ' + icon + '" aria-hidden="true"></span>' +
+              (timeText
+                ? ('<span class="route-timeline-point-time">' + escapeHtml(timeText) + '</span>')
+                : '') +
+              '<span class="route-timeline-point-label">' +
+                '<span class="route-timeline-point-name">' + escapeHtml(String(point.name || '')) + '</span>' +
+              '</span>' +
+              (roleText ? ('<span class="route-timeline-point-role">' + escapeHtml(roleText) + '</span>') : '') +
+            '</div>';
+          if (index < (data.connectors || []).length) {
+            var connector = data.connectors[index] || {};
+            var connectorKind = String(connector.kind || '').trim() === 'bus' ? 'bus' : 'walk';
+            html += '' +
+              '<div class="route-timeline-connector ' + (data.has_eta ? 'has-time' : 'no-time') + '">' +
+                buildConnectorMarkerHtml(connectorKind) +
+                '<span class="route-timeline-connector-text is-' + connectorKind + '">' + escapeHtml(String(connector.text || '')) + '</span>' +
+              '</div>';
+          }
+        });
+        html += '</div><div class="route-timeline-note">* 도착 예상 시간과 경로는 실제와 다를 수 있습니다.</div>';
+        return html;
+      }
+
+      function getActiveRouteTimelineData(option, placeName, isDepart) {
+        var departureTime = getOptionDisplayDepartureTime(option);
+        var entry = getRouteTimeSummaryEntry(option, departureTime);
+        if (entry && entry.status === 'ready' && entry.summary) {
+          return entry.summary;
+        }
+        var detail = getOptionExistingVariantDetail(option, departureTime);
+        var walkInfo = getRouteDisplayWalkInfo(option, isDepart);
+        return buildRouteTimelinePreviewData(option, placeName, isDepart, detail, walkInfo);
+      }
+
+      function syncRouteCardTimeSummary(card, option, placeName, isDepart) {
+        if (!card) return;
+        syncRouteCardMeta(card, option, isDepart);
+        var head = card.querySelector('.route-time-summary-head');
+        var body = card.querySelector('.route-time-summary-body');
+        var defaultDetail = card.querySelector('.route-detail-default');
+        var selectedDetail = card.querySelector('.route-detail-selected');
+        if (!head || !body) return;
+        var activeTimeline = getActiveRouteTimelineData(option, placeName, isDepart);
+        if (defaultDetail) defaultDetail.innerHTML = buildRouteCollapsedDetailHtml(activeTimeline);
+        if (selectedDetail) selectedDetail.innerHTML = buildRouteSelectedDetailHtml(activeTimeline);
+        var entry = getRouteTimeSummaryEntry(option, getOptionDisplayDepartureTime(option));
+        if (entry && entry.status === 'ready' && entry.summary) {
+          head.innerHTML = buildRouteTimeSummaryHeadHtml(entry.summary);
+          card.classList.add('has-time-summary');
+        } else {
+          head.innerHTML = '';
+          card.classList.remove('has-time-summary');
+        }
+        body.innerHTML = (
+          card.classList.contains('selected') &&
+          entry &&
+          entry.status === 'ready' &&
+          entry.summary
+        ) ? buildRouteTimeBarHtml(entry.summary) : '';
+      }
+
+      function syncRenderedRouteCardsForOption(option, placeName, isDepart) {
+        if (!routeOptionsWrap || !option) return;
+        var renderToken = String(option.__renderCardToken || '').trim();
+        if (!renderToken) return;
+        routeOptionsWrap.querySelectorAll('.route-option-card[data-route-card-token="' + renderToken + '"]').forEach(function(card) {
+          syncRouteCardTimeSummary(card, option, placeName, isDepart);
+        });
+      }
+
+      function refreshSelectedRouteOptionMap(option, placeName, isDepart) {
+        if (!routeOptionsWrap || !option) return;
+        var renderToken = String(option.__renderCardToken || '').trim();
+        if (!renderToken) return;
+        var selectedCard = routeOptionsWrap.querySelector('.route-option-card.selected[data-route-card-token="' + renderToken + '"]');
+        if (!selectedCard || selectedCard.classList.contains('expanded')) return;
+        drawOptionOnMap(option, placeName, isDepart, selectedCard);
+      }
+
+      function ensureRouteTimeSummary(option, placeName, isDepart, card, opts) {
+        opts = opts || {};
+        if (!option) return Promise.resolve(null);
+        var departureTime = String(opts.departureTime || getOptionDisplayDepartureTime(option)).trim();
+        if (!departureTime) return Promise.resolve(null);
+        if (!option.route_id) return Promise.resolve(null);
+        var existingEntry = getRouteTimeSummaryEntry(option, departureTime);
+        if (existingEntry && existingEntry.status === 'ready' && existingEntry.summary) {
+          syncRenderedRouteCardsForOption(option, placeName, isDepart);
+          return Promise.resolve(existingEntry.summary);
+        }
+        if (existingEntry && existingEntry.status === 'invalid') {
+          syncRenderedRouteCardsForOption(option, placeName, isDepart);
+          return Promise.resolve(null);
+        }
+        if (existingEntry && existingEntry.status === 'loading' && existingEntry.promise) {
+          return existingEntry.promise;
+        }
+
+        var walkLeg = getOptionWalkLegPositions(option.positions || [], isDepart);
+        if (!walkLeg) {
+          setRouteTimeSummaryEntry(option, departureTime, { status: 'invalid', summary: null, reason: 'missing_walk_leg' });
+          syncRenderedRouteCardsForOption(option, placeName, isDepart);
+          return Promise.resolve(null);
+        }
+        if (!walkOtpEnabled) {
+          setRouteTimeSummaryEntry(option, departureTime, { status: 'invalid', summary: null, reason: 'walk_otp_disabled' });
+          syncRenderedRouteCardsForOption(option, placeName, isDepart);
+          return Promise.resolve(null);
+        }
+
+        var detailPromise = opts.detail
+          ? Promise.resolve(cloneJsonValue(opts.detail))
+          : (function() {
+              var localDetail = getOptionExistingVariantDetail(option, departureTime);
+              if (localDetail) return Promise.resolve(localDetail);
+              return fetchRouteVariantDetailData(option.route_id, departureTime);
+            })();
+        var walkPromise = fetchWalkPathData(walkLeg.fromPos, walkLeg.toPos);
+        var pending = Promise.all([detailPromise, walkPromise])
+          .then(function(values) {
+            var detail = values[0] || null;
+            var walkInfo = values[1] || null;
+            if (walkInfo) {
+              option.__selectedWalkInfo = cloneJsonValue(walkInfo);
+            }
+            var summary = buildRouteTimeSummaryData(option, placeName, isDepart, departureTime, detail, walkInfo);
+            if (!summary) {
+              setRouteTimeSummaryEntry(option, departureTime, {
+                status: 'invalid',
+                summary: null,
+                reason: 'insufficient_data'
+              });
+              syncRenderedRouteCardsForOption(option, placeName, isDepart);
+              return null;
+            }
+            setRouteTimeSummaryEntry(option, departureTime, {
+              status: 'ready',
+              summary: summary
+            });
+            syncRenderedRouteCardsForOption(option, placeName, isDepart);
+            refreshSelectedRouteOptionMap(option, placeName, isDepart);
+            return summary;
+          })
+          .catch(function() {
+            clearRouteTimeSummaryEntry(option, departureTime);
+            syncRenderedRouteCardsForOption(option, placeName, isDepart);
+            return null;
+          });
+        setRouteTimeSummaryEntry(option, departureTime, {
+          status: 'loading',
+          summary: null,
+          promise: pending
+        });
+        if (card) syncRouteCardTimeSummary(card, option, placeName, isDepart);
+        return pending;
+      }
+
+      function scheduleRouteTimeSummaryPrefetch(options, placeName, isDepart) {
+        clearRouteTimeSummaryPrefetchTimers();
+        if (!Array.isArray(options) || options.length <= 1) return;
+        options.slice(1, ROUTE_TIME_SUMMARY_PREFETCH_LIMIT).forEach(function(option, idx) {
+          if (!option) return;
+          var timerId = setTimeout(function() {
+            ensureRouteTimeSummary(option, placeName, isDepart, null);
+          }, ROUTE_TIME_SUMMARY_PREFETCH_DELAY_MS * (idx + 1));
+          routeTimeSummaryPrefetchTimers.push(timerId);
+        });
+      }
+
       function isSuccessfulWalkPathResult(walkInfo) {
         if (!walkInfo) return false;
         if (walkInfo.has_route !== true) return false;
@@ -13089,71 +14191,11 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         });
       }
 
-      function buildSelectedRouteDetailHtml(option, placeName, isDepart, walkInfo) {
-        var positions = option.positions || [];
-        var straightWalk = buildStraightWalkInfo(positions, isDepart);
-        var distanceM = Number(walkInfo && walkInfo.distance_m);
-        if (!isFinite(distanceM) || distanceM <= 0) distanceM = Number(straightWalk.distance_m);
-        var durationSec = Number(walkInfo && walkInfo.duration_sec);
-        if (!isFinite(durationSec) || durationSec <= 0) durationSec = Number(straightWalk.duration_sec);
-        var distanceText = formatDistance(distanceM);
-        var isStraightFallback = !!(walkInfo && walkInfo.fallback_type === 'straight_line');
-        var walkSummary;
-        if (isStraightFallback) {
-          walkSummary = '직선거리 ' + distanceText;
-        } else {
-          var walkMinutes = (isFinite(durationSec) && durationSec > 0)
-            ? Math.max(1, Math.round(durationSec / 60))
-            : null;
-          walkSummary = (walkMinutes != null)
-            ? ('약 ' + String(walkMinutes) + '분 소요 (도보 ' + distanceText + ')')
-            : ('도보 ' + distanceText);
-        }
-
-        if (isDepart) {
-          return '' +
-            '<div class="route-step-row">' +
-              '<span class="route-step-name">' + escapeHtml(placeName || '출발지') + '</span>' +
-              '<span class="route-step-meta"></span>' +
-            '</div>' +
-            '<div class="route-step-arrow">' +
-              '<span class="arrow">↓</span><span class="route-step-distance">' + escapeHtml(walkSummary) + '</span>' +
-            '</div>' +
-            '<div class="route-step-row">' +
-              '<span class="route-step-name">' + escapeHtml(option.nearest_stop_name || '탑승 정류장') + '</span>' +
-              '<span class="route-step-meta"></span>' +
-            '</div>' +
-            '<div class="route-step-arrow"><span class="arrow">↓</span><span>셔틀 탑승</span></div>' +
-            '<div class="route-step-row">' +
-              '<span class="route-step-name">' + escapeHtml(option.terminus_name || '하차 정류장') + '</span>' +
-              '<span class="route-step-meta"></span>' +
-            '</div>';
-        }
-
-        return '' +
-          '<div class="route-step-row">' +
-            '<span class="route-step-name">' + escapeHtml(option.start_stop_name || '탑승 정류장') + '</span>' +
-            '<span class="route-step-meta"></span>' +
-          '</div>' +
-          '<div class="route-step-arrow"><span class="arrow">↓</span><span>셔틀 이동</span></div>' +
-          '<div class="route-step-row">' +
-            '<span class="route-step-name">' + escapeHtml(option.getoff_stop_name || '하차 정류장') + '</span>' +
-            '<span class="route-step-meta"></span>' +
-          '</div>' +
-          '<div class="route-step-arrow">' +
-            '<span class="arrow">↓</span><span class="route-step-distance">' + escapeHtml(walkSummary) + '</span>' +
-          '</div>' +
-          '<div class="route-step-row">' +
-            '<span class="route-step-name">' + escapeHtml(placeName || '도착지') + '</span>' +
-            '<span class="route-step-meta"></span>' +
-          '</div>';
-      }
-
       function applySelectedRouteCardDetail(card, option, placeName, isDepart, walkInfo) {
-        if (!card) return;
-        var selectedDetail = card.querySelector('.route-detail-selected');
-        if (!selectedDetail) return;
-        selectedDetail.innerHTML = buildSelectedRouteDetailHtml(option, placeName, isDepart, walkInfo);
+        if (!card || !option) return;
+        option.__selectedWalkInfo = cloneJsonValue(walkInfo || null);
+        syncRouteCardTimeSummary(card, option, placeName, isDepart);
+        syncRenderedRouteCardsForOption(option, placeName, isDepart);
       }
 
       function renderResults(list) {
@@ -13958,6 +15000,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var pathSegments = buildOptionPathSegments(option, positions, isDepart, walkPathPoints);
         var path = [];
         var timeStr = (option.board_time != null && option.board_time !== '') ? option.board_time : getDepartureTimeStr();
+        var currentSummaryEntry = getRouteTimeSummaryEntry(option, getOptionDisplayDepartureTime(option));
+        var readyTimeSummary = (currentSummaryEntry && currentSummaryEntry.status === 'ready' && currentSummaryEntry.summary)
+          ? currentSummaryEntry.summary
+          : null;
         var labels = isDepart
           ? [placeName, option.nearest_stop_name, option.terminus_name]
           : [option.start_stop_name, option.getoff_stop_name, placeName];
@@ -13984,9 +15030,19 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           var pointLabel = labels[i] || p.label || '';
           var namePart = '<span class="shuttle-point-name">' + escapeHtml(pointLabel) + '</span>';
           var tagPart = '';
-          if (isDepart && i === 1) tagPart = '<span class="time-tag">(' + timeStr + '분 노선 탑승)</span>';
-          if (!isDepart && i === 0) tagPart = '<span class="time-tag">(' + timeStr + '분 노선 탑승)</span>';
-          if (!isDepart && i === 1) {
+          if (readyTimeSummary && isDepart && i === 1 && readyTimeSummary.board_at) {
+            tagPart = '<span class="time-tag">(' + escapeHtml(String(readyTimeSummary.board_at)) + '분 탑승)</span>';
+          } else if (readyTimeSummary && isDepart && i === 2 && readyTimeSummary.alight_at) {
+            tagPart = '<span class="getoff-tag">(' + escapeHtml(String(readyTimeSummary.alight_at)) + '분 하차)</span>';
+          } else if (readyTimeSummary && !isDepart && i === 0 && readyTimeSummary.board_at) {
+            tagPart = '<span class="time-tag">(' + escapeHtml(String(readyTimeSummary.board_at)) + '분 탑승)</span>';
+          } else if (readyTimeSummary && !isDepart && i === 1 && readyTimeSummary.alight_at) {
+            tagPart = '<span class="getoff-tag">(' + escapeHtml(String(readyTimeSummary.alight_at)) + '분 하차)</span>';
+          } else if (isDepart && i === 1) {
+            tagPart = '<span class="time-tag">(' + timeStr + '분 노선 탑승)</span>';
+          } else if (!isDepart && i === 0) {
+            tagPart = '<span class="time-tag">(' + timeStr + '분 노선 탑승)</span>';
+          } else if (!isDepart && i === 1) {
             var seq = (option.getoff_stop_sequence != null && option.getoff_stop_sequence !== '')
               ? option.getoff_stop_sequence
               : null;
@@ -14392,6 +15448,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         card.classList.add('selected');
         expandedOptionIndex = -1;
         drawOptionOnMap(option, placeName, isDepart, card);
+        ensureRouteTimeSummary(option, placeName, isDepart, card);
       }
 
       function activateRouteCardDetailView(card, option, placeName, isDepart, idx, highlightTarget, isFromMapLabel) {
@@ -14403,6 +15460,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         card.classList.add('expanded', 'selected');
         expandedOptionIndex = getRouteCardIndex(card, idx);
         drawRouteDetailOnMap(option, placeName, isDepart, highlightTarget || null);
+        ensureRouteTimeSummary(option, placeName, isDepart, card);
         if (isFromMapLabel) {
           routeLabelTriggeredDetailState = {
             card: card,
@@ -14495,6 +15553,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         if (!isFinite(lat) || !isFinite(lng)) return null;
         return {
           place_name: String(currentPlaceName || (lastPlace && lastPlace.place_name) || '선택한 장소'),
+          address_name: String(lastPlace && lastPlace.address_name || ''),
           lat: lat,
           lng: lng
         };
@@ -14542,84 +15601,92 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         };
       }
 
-      function findRouteShareStop(option, sequence, displayName) {
-        var routeStops = Array.isArray(option && option.route_stops) ? option.route_stops : [];
-        var seqText = normalizeStopSequence(sequence);
-        var nameText = normalizeStopName(displayName);
-        var matched = null;
-        if (seqText) {
-          matched = routeStops.find(function(stop) {
-            return normalizeStopSequence(stop && stop.sequence) === seqText;
-          }) || null;
-        }
-        if (!matched && nameText) {
-          matched = routeStops.find(function(stop) {
-            return normalizeStopName(stop && stop.stop_name) === nameText;
-          }) || null;
-        }
-        return matched;
+      function getRouteShareKindLabel(option, isDepart) {
+        if (isShuttleRouteType(option && option.route_type)) return '셔틀';
+        return isDepart ? '출근' : '퇴근';
       }
 
-      function formatRouteShareStopSequence(sequence) {
-        var numeric = Number(sequence);
-        if (isFinite(numeric) && numeric > 0) return String(Math.round(numeric)) + '번째 정류장';
-        return '';
-      }
-
-      function formatRouteShareStopText(option, displayName, sequence) {
-        var matchedStop = findRouteShareStop(option, sequence, displayName);
-        var matchedName = String(matchedStop && matchedStop.stop_name || '').trim();
-        var primaryName = String(displayName || '').trim();
-        if (!primaryName && matchedName) primaryName = matchedName;
-        if (!primaryName) primaryName = '-';
-        var extras = [];
-        if (matchedName && matchedName !== primaryName) {
-          extras.push(matchedName);
-        }
-        var sequenceLabel = formatRouteShareStopSequence(sequence || (matchedStop && matchedStop.sequence));
-        if (sequenceLabel) {
-          extras.push(sequenceLabel);
-        }
-        return primaryName + (extras.length ? ' (' + extras.join(', ') + ')' : '');
-      }
-
-      function formatRouteShareBoardTime(timeText) {
+      function formatRouteShareDepartureLine(timeText) {
         var value = String(timeText || '').trim();
-        return value ? (value + '분') : '-';
+        if (!value) return '출발 시각 미정';
+        return (formatRouteMeridiemTime(value) || value) + ' 출발';
       }
 
-      function buildRouteShareMessage(snapshot, option) {
+      function getRouteSharePointLabel(point) {
+        var roleText = String(point && point.role || '').trim();
+        if (roleText) return roleText;
+        var icon = String(point && point.icon || '').trim();
+        if (icon === 'start') return '출발';
+        if (icon === 'arrive') return '도착';
+        return '경유';
+      }
+
+      function buildRouteSharePointLines(data) {
+        if (!data || !Array.isArray(data.points)) return [];
+        return data.points.map(function(point) {
+          var label = getRouteSharePointLabel(point);
+          var timeText = data.has_eta ? String(point && point.time || '').trim() : '';
+          var nameText = String(point && point.name || '').trim() || '-';
+          if (timeText) return label + '  ' + timeText + '  ' + nameText;
+          return label + '  ' + nameText;
+        });
+      }
+
+      function buildRouteShareContent(snapshot, option) {
         snapshot = snapshot || {};
         option = option || {};
         var isDepart = String(snapshot.direction || '').trim().toLowerCase() === 'depart';
         var place = snapshot.place || {};
-        var placeName = String(place.place_name || '선택한 위치').trim() || '선택한 위치';
-        var siteName = String(snapshot.site_name || '사업장').trim() || '사업장';
+        var placeName = formatRouteDisplayPlaceName(
+          place.place_name || '선택한 위치',
+          place.address_name || ''
+        );
         var routeName = String(option.route_name || '').trim() || '-';
-        var boardTime = formatRouteShareBoardTime(option.__activeDetailTime || option.__originBoardTime || option.board_time || snapshot.departure_time);
-        var boardStopText = isDepart
-          ? formatRouteShareStopText(option, option.nearest_stop_name, option.nearest_stop_sequence)
-          : formatRouteShareStopText(option, option.start_stop_name, option.start_stop_sequence);
-        var alightStopText = isDepart
-          ? formatRouteShareStopText(option, option.terminus_name, option.terminus_sequence)
-          : formatRouteShareStopText(option, option.getoff_stop_name, option.getoff_stop_sequence);
-        var originText = isDepart ? placeName : siteName;
-        var destinationText = isDepart ? siteName : placeName;
-        return [
+        var timelineData = getActiveRouteTimelineData(option, placeName, isDepart) || null;
+        var infoLine = '';
+        if (timelineData && timelineData.has_eta) {
+          var totalText = String(timelineData.total_text || '').trim();
+          var rangeText = String(timelineData.range_display || timelineData.range_text || '').trim();
+          infoLine = [totalText, rangeText].filter(Boolean).join(' · ');
+        } else {
+          infoLine = formatRouteShareDepartureLine(
+            timelineData && timelineData.departure_time
+              ? timelineData.departure_time
+              : (option.__activeDetailTime || option.__originBoardTime || option.board_time || snapshot.departure_time)
+          );
+        }
+        var lines = [
           '[셔틀Go: 셔틀 검색]',
-          '- 노선명: ' + routeName,
-          '- 출발: ' + originText,
-          '- 탑승: ' + boardStopText,
-          '- 탑승시각: ' + boardTime,
-          '- 하차: ' + alightStopText,
-          '- 도착: ' + destinationText
-        ].join('\n');
+          '(' + getRouteShareKindLabel(option, isDepart) + ') ' + routeName
+        ];
+        if (infoLine) lines.push(infoLine);
+        var pointLines = buildRouteSharePointLines(timelineData);
+        if (infoLine && pointLines.length) lines.push('');
+        pointLines.forEach(function(line) {
+          lines.push(line);
+        });
+        return {
+          lines: lines,
+          has_eta: !!(timelineData && timelineData.has_eta)
+        };
+      }
+
+      function buildRouteShareMessage(snapshot, option) {
+        return buildRouteShareContent(snapshot, option).lines.join('\n');
       }
 
       function buildRouteShareCopyText(snapshot, option, shareUrl) {
-        var message = buildRouteShareMessage(snapshot, option);
+        var content = buildRouteShareContent(snapshot, option);
+        var lines = content.lines.slice();
         var cleanUrl = String(shareUrl || '').trim();
-        return cleanUrl ? (message + '\n\n' + cleanUrl) : message;
+        if (cleanUrl) {
+          if (lines.length) lines.push('');
+          lines.push(cleanUrl);
+        }
+        if (content.has_eta) {
+          lines.push('* 도착 예상시간은 실제와 다를 수 있습니다.');
+        }
+        return lines.join('\n');
       }
 
       function getRouteShareCacheKey(snapshot) {
@@ -14783,6 +15850,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function showSharedRouteStateCard(title, body, opts) {
         opts = opts || {};
+        clearRouteTimeSummaryPrefetchTimers();
         setRouteMode(false);
         closeMaxDistancePopover();
         clearSearchOverlays();
@@ -14916,6 +15984,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         applySharedEndpointSnapshot(snapshot);
         lastPlace = {
           place_name: placeName,
+          address_name: String(place.address_name || ''),
           x: String(placeLng),
           y: String(placeLat),
           _place_source: String(snapshot.place_source || 'unknown'),
@@ -15260,53 +16329,64 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function shareRouteOption(option, card, button) {
         if (!button || !option) return;
         var originalText = button.getAttribute('data-default-label') || button.textContent || '공유';
-        var snapshot = buildRouteShareSnapshot(option, card);
-        if (!snapshot) {
-          showShuttleError('공유 링크를 만들 수 없습니다.');
-          resetRouteShareButtonLabel(button, originalText);
-          return;
-        }
-
-        var shareCacheKey = getRouteShareCacheKey(snapshot);
+        var placeName = currentPlaceName || (lastPlace && lastPlace.place_name) || '선택한 위치';
+        var isDepart = !!currentIsDepart;
         button.disabled = true;
-        button.textContent = '링크 생성 중...';
+        button.textContent = '정보 준비 중...';
 
-        var createShareTokenPromise = Promise.resolve().then(function() {
-          if (sharedRouteState.active && sharedRouteState.token) {
-            return String(sharedRouteState.token || '').trim();
-          }
-          if (shareCacheKey && routeShareTokenCache.has(shareCacheKey)) {
-            return String(routeShareTokenCache.get(shareCacheKey) || '').trim();
-          }
-          return fetchJson(API_BASE + '/api/route-shares', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ snapshot: snapshot })
+        Promise.resolve()
+          .then(function() {
+            return ensureRouteTimeSummary(option, placeName, isDepart, card);
           })
-            .then(function(result) {
-              if (!result.ok) {
-                throw new Error(result.data && result.data.error || '공유 링크 생성에 실패했습니다.');
+          .catch(function() {
+            return null;
+          })
+          .then(function() {
+            var snapshot = buildRouteShareSnapshot(option, card);
+            if (!snapshot) {
+              throw new Error('공유 링크를 만들 수 없습니다.');
+            }
+            var shareCacheKey = getRouteShareCacheKey(snapshot);
+            button.textContent = '링크 생성 중...';
+            return Promise.resolve().then(function() {
+              if (sharedRouteState.active && sharedRouteState.token) {
+                return String(sharedRouteState.token || '').trim();
               }
-              var createdToken = String(result.data && result.data.token || '').trim();
-              if (!createdToken) {
-                throw new Error('공유 링크 생성에 실패했습니다.');
+              if (shareCacheKey && routeShareTokenCache.has(shareCacheKey)) {
+                return String(routeShareTokenCache.get(shareCacheKey) || '').trim();
               }
-              if (shareCacheKey) {
-                routeShareTokenCache.set(shareCacheKey, createdToken);
-              }
-              return createdToken;
+              return fetchJson(API_BASE + '/api/route-shares', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ snapshot: snapshot })
+              })
+                .then(function(result) {
+                  if (!result.ok) {
+                    throw new Error(result.data && result.data.error || '공유 링크 생성에 실패했습니다.');
+                  }
+                  var createdToken = String(result.data && result.data.token || '').trim();
+                  if (!createdToken) {
+                    throw new Error('공유 링크 생성에 실패했습니다.');
+                  }
+                  if (shareCacheKey) {
+                    routeShareTokenCache.set(shareCacheKey, createdToken);
+                  }
+                  return createdToken;
+                });
+            }).then(function(token) {
+              return {
+                token: token,
+                snapshot: snapshot
+              };
             });
-        });
-
-        createShareTokenPromise
-          .then(function(token) {
+          })
+          .then(function(payload) {
+            var token = payload && payload.token;
+            var snapshot = payload && payload.snapshot;
             var shareUrl = buildRouteShareUrl(token);
             var shareCopyText = buildRouteShareCopyText(snapshot, option, shareUrl);
-            var shareMessage = buildRouteShareMessage(snapshot, option);
             var mobileSharePayload = {
-              title: '셔틀Go: 셔틀 검색',
-              text: shareMessage,
-              url: shareUrl
+              text: shareCopyText
             };
             if (!isMobile()) {
               openRouteSharePreviewDialog(shareCopyText, option.route_name || '노선');
@@ -15414,25 +16494,25 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         routeOptionsWrap.innerHTML = '';
         expandedOptionIndex = -1;
         routeLabelTriggeredDetailState = null;
+        clearRouteTimeSummaryPrefetchTimers();
         // "더 가져오기" 버튼 제거 (재렌더 시)
         var existingBtn = routeOptionsWrap.querySelector('.btn-load-more-routes');
         if (existingBtn) existingBtn.remove();
         var showShareButton = true;
         options.forEach(function(opt, idx) {
           var card = document.createElement('div');
+          opt.__renderCardToken = 'route-card-' + String(routeCardRenderTokenSeq += 1);
           card.className = 'route-option-card' + (idx === 0 ? ' selected' : '');
           card.setAttribute('data-route-index', String(idx));
-          var timeStr = (opt.board_time != null && opt.board_time !== '') ? opt.board_time : getDepartureTimeStr();
-          var serviceLabel = getRouteServiceLabel(opt.route_type, isDepart);
-          var pathDetailDefault = isDepart
-            ? escapeHtml(placeName) + ' → ' + escapeHtml(opt.nearest_stop_name) + ' → ' + escapeHtml(opt.terminus_name)
-            : escapeHtml(opt.start_stop_name) + ' → ' + escapeHtml(opt.getoff_stop_name) + ' 하차 → ' + escapeHtml(placeName);
-          var selectedDetailHtml = buildSelectedRouteDetailHtml(opt, placeName, isDepart, null);
-          var distStr = formatDistance(opt.distance_m);
-          var metaLine = distStr + ' · ' + timeStr + '분 ' + serviceLabel + ' 노선';
+          card.setAttribute('data-route-id', String(opt.route_id || ''));
+          card.setAttribute('data-route-card-token', String(opt.__renderCardToken || ''));
+          var initialTimeline = getActiveRouteTimelineData(opt, placeName, isDepart);
+          var pathDetailDefault = buildRouteCollapsedDetailHtml(initialTimeline);
+          var selectedDetailHtml = buildRouteSelectedDetailHtml(initialTimeline);
           var allTimes = opt.all_departure_times || [];
+          var currentTimeText = getOptionDisplayDepartureTime(opt);
           var timesHtml = allTimes.map(function(t) {
-            var isCurrent = (t === timeStr);
+            var isCurrent = (t === currentTimeText);
             return '<span class="time-item' + (isCurrent ? ' current' : '') + '">' + escapeHtml(t) + '</span>';
           }).join('');
           // 탑승/하차 정류장 이름 결정
@@ -15454,10 +16534,11 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           }).join('');
           var optionUpdatedAt = getRouteCardUpdatedAt(opt);
           card.innerHTML =
+            '<div class="route-time-summary-head"></div>' +
             '<div class="card-main">' +
               '<div class="card-title-wrap">' +
                 '<div class="route-name">' + buildRouteNameHtml(opt) + '</div>' +
-                '<div class="route-meta">' + escapeHtml(metaLine) + '</div>' +
+                '<div class="route-meta">' + escapeHtml(buildRouteMetaLineText(opt, isDepart)) + '</div>' +
               '</div>' +
               '<div class="route-card-actions">' +
                 '<button type="button" class="btn-route-detail" data-idx="' + idx + '">상세</button>' +
@@ -15466,6 +16547,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
                   : '') +
               '</div>' +
             '</div>' +
+            '<div class="route-time-summary-body"></div>' +
             '<div class="route-detail">' +
               '<div class="route-detail-default">' + pathDetailDefault + '</div>' +
               '<div class="route-detail-selected">' + selectedDetailHtml + '</div>' +
@@ -15483,17 +16565,26 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             '</div>';
           var btnDetail = card.querySelector('.btn-route-detail');
           var btnShare = card.querySelector('.btn-route-share');
-          card.addEventListener('click', function(e) {
-            if (e.target.closest('.btn-route-detail') || e.target.closest('.btn-route-share')) return;
-            activateRouteCardOptionView(card, opt, placeName, isDepart);
-          });
-          btnDetail.addEventListener('click', function(e) {
-            e.stopPropagation();
+          var toggleRouteDetail = function() {
             if (expandedOptionIndex === idx) {
               activateRouteCardOptionView(card, opt, placeName, isDepart);
               return;
             }
             activateRouteCardDetailView(card, opt, placeName, isDepart, idx, null, false);
+          };
+          card.addEventListener('click', function(e) {
+            if (e.target.closest('.btn-route-detail') || e.target.closest('.btn-route-share')) return;
+            if (e.target.closest('.route-detail-panel')) return;
+            var isCardActive = card.classList.contains('selected') || card.classList.contains('expanded');
+            if (!isCardActive) {
+              activateRouteCardOptionView(card, opt, placeName, isDepart);
+              return;
+            }
+            toggleRouteDetail();
+          });
+          btnDetail.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleRouteDetail();
           });
           if (btnShare) {
             btnShare.addEventListener('click', function(e) {
@@ -15502,6 +16593,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             });
           }
           routeOptionsWrap.appendChild(card);
+          syncRouteCardTimeSummary(card, opt, placeName, isDepart);
         });
         // 마지막 배치가 3개(max_routes)이면 "더 가져오기" 버튼 표시
         var lastBatchSize = options._lastBatchSize != null ? options._lastBatchSize : options.length;
@@ -15515,6 +16607,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         }
         var firstCard = routeOptionsWrap.querySelector('.route-option-card.selected');
         drawOptionOnMap(options[0], placeName, isDepart, firstCard);
+        if (options[0]) {
+          ensureRouteTimeSummary(options[0], placeName, isDepart, firstCard);
+        }
+        scheduleRouteTimeSummaryPrefetch(options, placeName, isDepart);
       }
 
       function loadMoreRoutes(btn) {
@@ -15565,6 +16661,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function renderRouteOptions(options, placeName, isDepart, lastDepartureTime, preserveSheetState, emptyMessage) {
         activeOptionDrawToken += 1;
         var shouldPreserveSheetState = !!preserveSheetState;
+        clearRouteTimeSummaryPrefetchTimers();
         setRouteMode(true, isDepart ? 'depart' : 'arrive', placeName);
         panelTitle.textContent = '노선 선택';
         var btnBack = document.getElementById('btnBackFromRoutes');
@@ -19379,29 +20476,9 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             });
           });
         }
-        if (!panel.querySelector('.route-detail-note')) {
-          var noteEl = document.createElement('div');
-          noteEl.className = 'route-detail-note';
-          noteEl.textContent = '* 도착 예상 시간과 경로는 실제와 다를 수 있습니다.';
-          var dividerEl = document.createElement('div');
-          dividerEl.className = 'route-detail-note-divider';
-          var existingOperator = panel.querySelector('.route-operator-info');
-          var existingUpdated = panel.querySelector('.route-db-updated');
-          if (existingOperator) {
-            panel.insertBefore(noteEl, existingOperator);
-            if (existingUpdated) {
-              panel.insertBefore(dividerEl, existingUpdated);
-            } else {
-              panel.insertBefore(dividerEl, existingOperator.nextSibling);
-            }
-          } else if (existingUpdated) {
-            panel.insertBefore(noteEl, existingUpdated);
-            panel.insertBefore(dividerEl, existingUpdated);
-          } else {
-            panel.appendChild(noteEl);
-            panel.appendChild(dividerEl);
-          }
-        }
+        panel.querySelectorAll('.route-detail-note, .route-detail-note-divider').forEach(function(node) {
+          if (node && node.parentNode) node.parentNode.removeChild(node);
+        });
         syncRouteUpdatedInfo(panel, updatedAtText);
       }
 
@@ -19463,7 +20540,13 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           operatorInfo.style.display = nextOperatorText ? '' : 'none';
         }
         option.operator = nextOperatorText;
+        syncRouteCardTimeSummary(card, option, placeName, isDepart);
+        syncRenderedRouteCardsForOption(option, placeName, isDepart);
         syncRouteUpdatedInfo(panel, getRouteCardUpdatedAt(option));
+        ensureRouteTimeSummary(option, placeName, isDepart, card, {
+          departureTime: selectedTime,
+          detail: detail
+        });
         if (card.classList.contains('expanded') && card.classList.contains('selected')) {
           drawRouteDetailOnMap(option, placeName, isDepart, option.__detailHighlightTarget || null, false);
           if (option.__detailOpenedFromMapLabel) {
@@ -19480,14 +20563,9 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function loadRouteVariantDetail(card, option, placeName, isDepart, requestedTime) {
         if (!card || !option) return;
         var departureTime = String(requestedTime || option.__activeDetailTime || option.board_time || getDepartureTimeStr());
-        fetchJson(
-          API_BASE + '/api/route/' + encodeURIComponent(String(option.route_id)) + '/variant-detail' +
-          '?day_type=' + encodeURIComponent(selectedDayType) +
-          '&departure_time=' + encodeURIComponent(departureTime)
-        )
-          .then(function(result) {
-            if (!result.ok) throw new Error(result.data.error || '노선 상세를 불러오지 못했습니다.');
-            applyRouteVariantDetailToCard(card, option, placeName, isDepart, result.data || {});
+        fetchRouteVariantDetailData(option.route_id, departureTime)
+          .then(function(detail) {
+            applyRouteVariantDetailToCard(card, option, placeName, isDepart, detail || {});
           })
           .catch(function() {});
       }
@@ -19540,6 +20618,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           option.__originBoardTime = String(option.__originBoardTime || option.board_time || getDepartureTimeStr());
           option.__activeDetailTime = String(option.__activeDetailTime || option.__originBoardTime);
           enhanceRouteDetailPanel(card, option, placeName, isDepart);
+          syncRouteCardTimeSummary(card, option, placeName, isDepart);
         });
       };
 
