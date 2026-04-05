@@ -1204,6 +1204,382 @@
       border-top: 1px solid #f1f5f9;
       margin: 8px 0;
     }
+    .home-favorites-empty,
+    .home-favorites-login,
+    .home-favorite-card {
+      margin: 10px 14px 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+    .home-favorites-empty,
+    .home-favorites-login {
+      padding: 18px 16px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .home-favorites-login strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #0f172a;
+      font-size: 15px;
+    }
+    .home-favorites-login-btn {
+      margin-top: 14px;
+      width: 100%;
+      min-height: 42px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .home-favorites-login-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .home-favorite-card {
+      padding: 14px 15px;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .home-favorites-view-all {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 12px 14px 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .home-favorites-view-all:hover {
+      color: #0f172a;
+    }
+    .home-favorite-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+      border-color: #d6deea;
+    }
+    .home-favorite-card.unavailable {
+      cursor: default;
+      opacity: 0.78;
+      background: #f8fafc;
+      border-style: dashed;
+    }
+    .home-favorite-topline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .home-favorite-title {
+      min-width: 0;
+      flex: 1;
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .home-favorite-meta,
+    .home-favorite-subline,
+    .home-favorite-note {
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #64748b;
+    }
+    .home-favorite-note.unavailable {
+      color: #b45309;
+      font-weight: 700;
+    }
+    .home-favorite-badge {
+      flex: 0 0 auto;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .home-favorite-badge.depart {
+      border: 1px solid #bfdbfe;
+      background: #e8f0ff;
+      color: #1d4ed8;
+    }
+    .home-favorite-badge.arrive {
+      border: 1px solid #bbf7d0;
+      background: #eaf9ee;
+      color: #15803d;
+    }
+    .home-favorite-badge.shuttle {
+      border: 1px solid #111;
+      background: #111;
+      color: #fff;
+    }
+    .home-favorite-badge.unavailable {
+      background: #fff1f2;
+      color: #b91c1c;
+      border: 1px solid #fecdd3;
+    }
+    .route-favorites-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 214;
+      background: rgba(15, 23, 42, 0.32);
+    }
+    .route-favorites-backdrop.show {
+      display: block;
+    }
+    .route-favorites-modal {
+      position: fixed;
+      z-index: 215;
+      top: 50%;
+      left: 50%;
+      width: min(520px, calc(100vw - 24px));
+      max-height: min(78vh, 720px);
+      transform: translate(-50%, -50%);
+      border-radius: 18px;
+      border: 1px solid #dbe3ef;
+      background: #fff;
+      box-shadow: 0 24px 44px rgba(15, 23, 42, 0.22);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .route-favorites-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .route-favorites-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .route-favorites-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #475569;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .route-favorites-close:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .route-favorites-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .route-favorites-loading,
+    .route-favorites-empty,
+    .route-favorites-login {
+      padding: 18px 16px;
+      border: 1px dashed #dbe3ef;
+      border-radius: 14px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .route-favorites-login strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #0f172a;
+      font-size: 15px;
+    }
+    .route-favorite-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #fff;
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .route-favorite-item.available {
+      cursor: pointer;
+    }
+    .route-favorite-item.available:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    }
+    .route-favorite-item.unavailable {
+      background: #f8fafc;
+      border-style: dashed;
+    }
+    .route-favorite-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .route-favorite-main {
+      min-width: 0;
+      flex: 1;
+    }
+    .route-favorite-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.45;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .route-favorite-summary,
+    .route-favorite-detail {
+      margin-top: 5px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #64748b;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    .route-favorite-warning {
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #b45309;
+      font-weight: 700;
+    }
+    .route-favorite-toggle {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #f2c94c;
+      background: #fff4cc;
+      color: #a16207;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .route-favorite-toggle:hover {
+      background: #fff9db;
+      border-color: #e8c74e;
+      color: #9a6700;
+    }
+    .route-favorite-toggle:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+    .favorite-login-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 216;
+      background: rgba(15, 23, 42, 0.35);
+    }
+    .favorite-login-backdrop.show {
+      display: block;
+    }
+    .favorite-login-modal {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(360px, calc(100vw - 24px));
+      padding: 22px 20px 18px;
+      border-radius: 18px;
+      border: 1px solid #dbe3ef;
+      background: #fff;
+      box-shadow: 0 24px 44px rgba(15, 23, 42, 0.22);
+    }
+    .favorite-login-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .favorite-login-body {
+      margin-top: 10px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .favorite-login-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .favorite-login-actions button {
+      flex: 1;
+      min-height: 42px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .favorite-login-cancel {
+      background: #fff;
+      color: #334155;
+    }
+    .favorite-login-cancel:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .favorite-login-confirm {
+      background: #111827;
+      border-color: #111827;
+      color: #fff;
+    }
+    .favorite-login-confirm:hover {
+      background: #0f172a;
+      border-color: #0f172a;
+    }
+    @media (max-width: 768px) {
+      .route-favorites-modal {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 82vh;
+        transform: none;
+        border-radius: 18px 18px 0 0;
+      }
+      .favorite-login-modal {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        transform: none;
+        border-radius: 18px 18px 0 0;
+      }
+    }
     .route-search-mode-indicator {
       flex: 0 0 auto;
       font-size: 12px;
@@ -3838,18 +4214,22 @@
     }
     .route-option-card .btn-route-detail {
       flex-shrink: 0;
+      min-height: 30px;
       padding: 4px 10px;
       font-size: 13px;
-      font-weight: 600;
-      color: #555;
-      background: #f0f0f0;
-      border: 1px solid #ddd;
+      font-weight: 700;
+      color: #64748b;
+      background: #fff;
+      border: 1px solid #d5dbe3;
       border-radius: 6px;
+      box-sizing: border-box;
       cursor: pointer;
       white-space: nowrap;
+      order: 1;
     }
     .route-option-card .btn-route-share {
       flex-shrink: 0;
+      min-height: 30px;
       padding: 4px 10px;
       font-size: 13px;
       font-weight: 600;
@@ -3857,21 +4237,56 @@
       background: #fff;
       border: 1px solid #d5d5d5;
       border-radius: 6px;
+      box-sizing: border-box;
       cursor: pointer;
       white-space: nowrap;
+      order: 2;
     }
-    .route-option-card .btn-route-detail:hover {
-      background: #e8e8e8;
-      border-color: #ccc;
+    .route-option-card .btn-route-favorite {
+      flex-shrink: 0;
+      min-width: 34px;
+      min-height: 30px;
+      padding: 4px 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #64748b;
+      background: #fff;
+      border: 1px solid #d5dbe3;
+      border-radius: 6px;
+      box-sizing: border-box;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      order: 0;
+    }
+    .route-option-card .route-favorite-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+      flex: 0 0 auto;
+      pointer-events: none;
+    }
+    .route-option-card .btn-route-detail:hover,
+    .route-option-card .btn-route-favorite:hover {
+      background: #fff9db;
+      border-color: #e8c74e;
+      color: #9a6700;
     }
     .route-option-card .btn-route-share:hover {
       background: #f5f5f5;
       border-color: #c6c6c6;
     }
-    .route-option-card.expanded .btn-route-detail {
-      background: #fee500;
-      border-color: #e6d000;
-      color: #333;
+    .route-option-card.expanded .btn-route-detail,
+    .route-option-card .btn-route-favorite.active {
+      color: #a16207;
+      background: #fff4cc;
+      border-color: #f2c94c;
+    }
+    .route-option-card .btn-route-favorite:disabled {
+      opacity: 0.6;
+      cursor: wait;
     }
     .route-shared-banner {
       display: flex;
@@ -4239,8 +4654,9 @@
       }
       .search-bar input {
         min-width: 0;
-        padding: 11px 12px;
-        font-size: 14px;
+        height: 40px;
+        padding: 0 12px;
+        font-size: 16px;
       }
       .search-bar button {
         padding: 11px 12px;
@@ -4417,8 +4833,19 @@
         width: 100%;
         max-width: none;
         min-height: 40px;
-        font-size: 13px;
-        padding: 9px 10px;
+      }
+      .route-mode-place-label {
+        height: 40px;
+        font-size: 16px;
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-right: 10px;
+      }
+      .route-endpoint-trigger {
+        font-size: 16px;
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-right: 10px;
       }
 
       .main-content {
@@ -6349,10 +6776,59 @@
       .report-history-filter-input,
       .report-history-filter-select {
         height: 42px;
-        font-size: 14px;
+        font-size: 16px;
         line-height: 1.35;
         padding-left: 12px;
         padding-right: 12px;
+      }
+      /* Keep user-editable controls at 16px on iOS to prevent automatic zoom. */
+      .endpoint-picker-search-input,
+      .profile-modal-field input,
+      .issue-comment-nickname-row input,
+      .issue-form-group input,
+      .issue-comment-compose textarea,
+      .issue-form-group textarea,
+      .report-route-search-input,
+      .issue-state-filter {
+        font-size: 16px;
+      }
+      .endpoint-picker-search-input,
+      .profile-modal-field input,
+      .issue-comment-nickname-row input,
+      .issue-form-group input,
+      .issue-state-filter {
+        height: 40px;
+      }
+      .endpoint-picker-search-input,
+      .profile-modal-field input,
+      .issue-comment-nickname-row input {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      .endpoint-picker-search-input,
+      .profile-modal-field input,
+      .issue-comment-nickname-row input,
+      .issue-form-group input,
+      .issue-state-filter {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      .issue-form-group input {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      .issue-comment-compose textarea,
+      .issue-form-group textarea {
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
+      .report-route-search-input {
+        padding-top: 2px;
+        padding-bottom: 4px;
+      }
+      .issue-state-filter {
+        padding-left: 10px;
+        padding-right: 10px;
       }
       .dev-debug-panel {
         width: min(90px, calc(100% - 24px));
@@ -6511,6 +6987,7 @@
     </div>
     <div class="account-menu-divider" id="accountMenuDividerAfterPrimary"></div>
     <button type="button" class="account-menu-item" id="accountMenuLeaderboardBtn"><img class="account-menu-item-icon" src="rank_icon.png" alt="" /><span class="account-menu-item-label">랭킹</span></button>
+    <button type="button" class="account-menu-item" id="accountMenuFavoritesBtn"><span class="account-menu-item-icon account-menu-item-icon-glyph" aria-hidden="true">★</span><span class="account-menu-item-label">즐겨찾기</span></button>
     <button type="button" class="account-menu-item" id="accountMenuReportsBtn"><img class="account-menu-item-icon" src="report_departure_time_icon.png" alt="" /><span class="account-menu-item-label">제보 기록</span></button>
     <button type="button" class="account-menu-item" id="accountMenuProfileBtn"><img class="account-menu-item-icon" src="profile_icon.png" alt="" /><span class="account-menu-item-label">내 프로필</span></button>
     <button type="button" class="account-menu-item" id="accountMenuSettingsBtn"><span class="account-menu-item-icon account-menu-item-icon-glyph" aria-hidden="true">⚙</span><span class="account-menu-item-label">설정</span></button>
@@ -6976,6 +7453,7 @@
       var accountMenuDividerAfterProfile = document.getElementById('accountMenuDividerAfterProfile');
       var accountMenuLoginBtn = document.getElementById('accountMenuLoginBtn');
       var accountMenuLeaderboardBtn = document.getElementById('accountMenuLeaderboardBtn');
+      var accountMenuFavoritesBtn = document.getElementById('accountMenuFavoritesBtn');
       var accountMenuSettingsBtn = document.getElementById('accountMenuSettingsBtn');
       var accountMenuProfileBtn = document.getElementById('accountMenuProfileBtn');
       var accountMenuReportsBtn = document.getElementById('accountMenuReportsBtn');
@@ -7047,6 +7525,7 @@
       var overlays = [];
       var markerElements = [];
       var places = [];
+      var resultsPanelState = 'idle';
       var selectedSiteId = '0000013';
       var selectedDayType = 'weekday';
       var dbUpdatedAt = '';
@@ -7132,6 +7611,15 @@
         createdAt: '',
         expiresAt: ''
       };
+      var favoriteStatusByRouteId = {};
+      var favoriteStatusRequestSeq = 0;
+      var recentFavoriteItems = [];
+      var recentFavoritesLoading = false;
+      var routeFavoritesModal = null;
+      var routeFavoritesModalLoading = false;
+      var routeFavoritesModalItems = [];
+      var favoriteLoginPromptModal = null;
+      var favoriteResolveRequestSeq = 0;
       var routeShareTokenCache = new Map();
       var routeSharePreviewDialog = null;
       var pendingSharedRouteToken = '';
@@ -8545,9 +9033,14 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             return authState;
           })
           .then(function(state) {
-            return syncSelectedSiteFromAuthPreferences().then(function() {
-              return state;
-            });
+            return syncSelectedSiteFromAuthPreferences()
+              .catch(function() { return false; })
+              .then(function() {
+                return handleFavoritesAfterAuthRefresh();
+              })
+              .then(function() {
+                return state;
+              });
           })
           .catch(function() {
             authState = { logged_in: false, user: null, preferences: {} };
@@ -8556,7 +9049,9 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             updateAccountMenuUi();
             refreshAccountMenuRankBadge();
             refreshNoticeSpotlightHint();
-            return authState;
+            return handleFavoritesAfterAuthRefresh().then(function() {
+              return authState;
+            });
           });
       }
 
@@ -8564,6 +9059,703 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var callbackUrl = location.origin + '/auth-callback.html';
         var loginUrl = API_BASE + '/api/auth/google/start?next=' + encodeURIComponent(callbackUrl);
         location.href = loginUrl;
+      }
+
+      function normalizeRouteFavoriteId(value) {
+        var routeId = Number(value);
+        if (!isFinite(routeId) || routeId <= 0) return 0;
+        return Math.round(routeId);
+      }
+
+      function isRouteFavorited(routeId) {
+        var normalizedRouteId = normalizeRouteFavoriteId(routeId);
+        if (!normalizedRouteId) return false;
+        return favoriteStatusByRouteId[String(normalizedRouteId)] === true;
+      }
+
+      function setRouteFavorited(routeId, favorited) {
+        var normalizedRouteId = normalizeRouteFavoriteId(routeId);
+        if (!normalizedRouteId) return;
+        if (favorited) favoriteStatusByRouteId[String(normalizedRouteId)] = true;
+        else delete favoriteStatusByRouteId[String(normalizedRouteId)];
+      }
+
+      function ensureFavoriteLoginPromptModal() {
+        if (
+          favoriteLoginPromptModal &&
+          favoriteLoginPromptModal.backdrop &&
+          document.body.contains(favoriteLoginPromptModal.backdrop)
+        ) {
+          return favoriteLoginPromptModal;
+        }
+
+        var backdrop = document.createElement('div');
+        backdrop.className = 'favorite-login-backdrop';
+        backdrop.setAttribute('aria-hidden', 'true');
+
+        var modal = document.createElement('div');
+        modal.className = 'favorite-login-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-label', '즐겨찾기 로그인 안내');
+        modal.innerHTML =
+          '<div class="favorite-login-title">로그인이 필요합니다</div>' +
+          '<div class="favorite-login-body">즐겨찾기는 Google 계정으로 로그인한 뒤 사용할 수 있습니다.</div>' +
+          '<div class="favorite-login-actions">' +
+            '<button type="button" class="favorite-login-cancel" data-favorite-login-close="1">닫기</button>' +
+            '<button type="button" class="favorite-login-confirm" data-favorite-login-start="1">Google 로그인</button>' +
+          '</div>';
+
+        backdrop.appendChild(modal);
+        document.body.appendChild(backdrop);
+
+        favoriteLoginPromptModal = {
+          backdrop: backdrop,
+          modal: modal,
+          closeButton: modal.querySelector('[data-favorite-login-close="1"]'),
+          startButton: modal.querySelector('[data-favorite-login-start="1"]')
+        };
+
+        backdrop.addEventListener('click', function(evt) {
+          if (evt.target === backdrop) closeFavoriteLoginPromptModal();
+        });
+        if (favoriteLoginPromptModal.closeButton) {
+          favoriteLoginPromptModal.closeButton.addEventListener('click', closeFavoriteLoginPromptModal);
+        }
+        if (favoriteLoginPromptModal.startButton) {
+          favoriteLoginPromptModal.startButton.addEventListener('click', function() {
+            closeFavoriteLoginPromptModal();
+            startGoogleLogin();
+          });
+        }
+        document.addEventListener('keydown', function(evt) {
+          if (!favoriteLoginPromptModal || !favoriteLoginPromptModal.backdrop) return;
+          if (!favoriteLoginPromptModal.backdrop.classList.contains('show')) return;
+          if (evt.key === 'Escape') {
+            evt.preventDefault();
+            closeFavoriteLoginPromptModal();
+          }
+        });
+        return favoriteLoginPromptModal;
+      }
+
+      function openFavoriteLoginPromptModal() {
+        var modalRef = ensureFavoriteLoginPromptModal();
+        if (!modalRef || !modalRef.backdrop) return;
+        modalRef.backdrop.classList.add('show');
+        modalRef.backdrop.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeFavoriteLoginPromptModal() {
+        if (!favoriteLoginPromptModal || !favoriteLoginPromptModal.backdrop) return;
+        favoriteLoginPromptModal.backdrop.classList.remove('show');
+        favoriteLoginPromptModal.backdrop.setAttribute('aria-hidden', 'true');
+      }
+
+      function promptGoogleLoginForFavorites() {
+        if (authState && authState.logged_in) return false;
+        openFavoriteLoginPromptModal();
+        return true;
+      }
+
+      function getSiteNameById(siteId) {
+        var value = String(siteId || '').trim();
+        if (!value || !siteSelect || !siteSelect.options) return value;
+        for (var i = 0; i < siteSelect.options.length; i++) {
+          var option = siteSelect.options[i];
+          if (String(option.value || '') === value) {
+            return String(option.text || '').trim() || value;
+          }
+        }
+        return value;
+      }
+
+      function getFavoriteBadgeInfo(item) {
+        if (item && item.available === false) {
+          return { label: '존재하지 않음', className: 'unavailable' };
+        }
+        if (isShuttleRouteType(item && item.route_type)) {
+          return { label: '셔틀', className: 'shuttle' };
+        }
+        return String(item && item.direction || '').trim().toLowerCase() === 'arrive'
+          ? { label: '퇴근', className: 'arrive' }
+          : { label: '출근', className: 'depart' };
+      }
+
+      function getFavoriteDayTypeLabel(dayType) {
+        var value = String(dayType || '').trim();
+        return DAY_TYPE_LABEL_MAP[value] || value || '요일 미지정';
+      }
+
+      function getFavoriteRouteEndpointName(item, endpointType) {
+        var favorite = item || {};
+        var isArrive = String(favorite.direction || '').trim().toLowerCase() === 'arrive';
+        var originName = String(favorite.route_origin_name || '').trim();
+        var destinationName = String(favorite.route_destination_name || '').trim();
+        var siteStopName = String(favorite.site_stop_name || '').trim();
+        var placeName = String(favorite.place_name || '선택한 장소').trim() || '선택한 장소';
+        if (endpointType === 'origin') {
+          if (originName) return originName;
+          return isArrive ? (siteStopName || '출발지 정보 없음') : placeName;
+        }
+        if (destinationName) return destinationName;
+        return isArrive ? placeName : (siteStopName || '도착지 정보 없음');
+      }
+
+      function buildFavoriteMetaText(item) {
+        var parts = [];
+        var siteName = getSiteNameById(item && item.site_id);
+        var dayTypeLabel = getFavoriteDayTypeLabel(item && item.day_type);
+        var departureTime = String(item && item.departure_time || '').trim();
+        if (siteName) parts.push(siteName);
+        if (dayTypeLabel) parts.push(dayTypeLabel);
+        if (departureTime) parts.push(departureTime + ' 출발');
+        return parts.join(' · ');
+      }
+
+      function buildFavoriteRouteFlowText(item) {
+        return getFavoriteRouteEndpointName(item, 'origin') + ' \u2192 ' + getFavoriteRouteEndpointName(item, 'destination');
+      }
+
+      function createGoogleLoginButton() {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'home-favorites-login-btn';
+        btn.innerHTML =
+          '<img class="account-menu-google-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="" />' +
+          '<span>Google 계정으로 로그인</span>';
+        btn.addEventListener('click', function() {
+          startGoogleLogin();
+        });
+        return btn;
+      }
+
+      function buildHomeFavoriteCard(item) {
+        var favorite = item || {};
+        var card = document.createElement('div');
+        card.className = 'home-favorite-card' + (favorite.available === false ? ' unavailable' : '');
+
+        var topLine = document.createElement('div');
+        topLine.className = 'home-favorite-topline';
+
+        var title = document.createElement('div');
+        title.className = 'home-favorite-title';
+        title.textContent = String(favorite.route_name || '노선');
+        topLine.appendChild(title);
+
+        var badgeInfo = getFavoriteBadgeInfo(favorite);
+        var badge = document.createElement('span');
+        badge.className = 'home-favorite-badge ' + badgeInfo.className;
+        badge.textContent = badgeInfo.label;
+        topLine.appendChild(badge);
+        card.appendChild(topLine);
+
+        var meta = document.createElement('div');
+        meta.className = 'home-favorite-meta';
+        meta.textContent = buildFavoriteMetaText(favorite);
+        card.appendChild(meta);
+
+        var subline = document.createElement('div');
+        subline.className = 'home-favorite-subline';
+        subline.textContent = buildFavoriteRouteFlowText(favorite);
+        card.appendChild(subline);
+
+        if (favorite.available === false) {
+          var note = document.createElement('div');
+          note.className = 'home-favorite-note unavailable';
+          note.textContent = '현재 DB에서 해당 노선을 찾을 수 없습니다. 햄버거 메뉴의 즐겨찾기에서 삭제할 수 있습니다.';
+          card.appendChild(note);
+        }
+
+        if (favorite.available !== false) {
+          card.addEventListener('click', function() {
+            openRouteFavoriteRoute(favorite.route_id, { source: 'home' });
+          });
+        }
+        return card;
+      }
+
+      function renderRecentFavoritesHomePanel() {
+        if (!resultsList || !resultsPlaceholder || !panelTitle) return;
+        panelTitle.textContent = '즐겨찾기';
+        resultsPlaceholder.style.display = 'none';
+        resultsList.style.display = 'flex';
+        resultsList.innerHTML = '';
+
+        if (!authState.logged_in) {
+          var loginCard = document.createElement('div');
+          loginCard.className = 'home-favorites-login';
+          loginCard.textContent = '로그인하면 노선을 즐겨찾기에 저장할 수 있습니다.';
+          loginCard.appendChild(createGoogleLoginButton());
+          resultsList.appendChild(loginCard);
+          return;
+        }
+
+        if (recentFavoritesLoading) {
+          var loadingCard = document.createElement('div');
+          loadingCard.className = 'home-favorites-empty';
+          loadingCard.textContent = '최근 즐겨찾기를 불러오는 중입니다...';
+          resultsList.appendChild(loadingCard);
+          return;
+        }
+
+        if (!Array.isArray(recentFavoriteItems) || recentFavoriteItems.length === 0) {
+          var emptyCard = document.createElement('div');
+          emptyCard.className = 'home-favorites-empty';
+          emptyCard.textContent = '최근 저장한 즐겨찾기가 아직 없습니다. 노선을 검색한 뒤 별 버튼으로 저장해 보세요.';
+          resultsList.appendChild(emptyCard);
+          return;
+        }
+
+        recentFavoriteItems.slice(0, 5).forEach(function(item) {
+          resultsList.appendChild(buildHomeFavoriteCard(item));
+        });
+
+        if (recentFavoriteItems.length > 5) {
+          var viewAllBtn = document.createElement('button');
+          viewAllBtn.type = 'button';
+          viewAllBtn.className = 'home-favorites-view-all';
+          viewAllBtn.textContent = '모든 즐겨찾기 보기';
+          viewAllBtn.addEventListener('click', function() {
+            openRouteFavoritesModal();
+          });
+          resultsList.appendChild(viewAllBtn);
+        }
+      }
+
+      function refreshIdleFavoritesPanelIfVisible() {
+        var hasRouteResults = !!(routeOptionsWrap && routeOptionsWrap.classList.contains('show'));
+        if (hasRouteResults || resultsPanelState !== 'idle') return;
+        showPlaceResultsView();
+        renderRecentFavoritesHomePanel();
+      }
+
+      function syncRouteFavoriteButtonsInView() {
+        if (!routeOptionsWrap) return;
+        routeOptionsWrap.querySelectorAll('.btn-route-favorite').forEach(function(button) {
+          var routeId = normalizeRouteFavoriteId(button.getAttribute('data-route-id'));
+          var favorited = isRouteFavorited(routeId);
+          button.classList.toggle('active', favorited);
+          button.setAttribute('aria-pressed', favorited ? 'true' : 'false');
+          button.setAttribute('aria-label', favorited ? '즐겨찾기 해제' : '즐겨찾기');
+          button.setAttribute('title', favorited ? '즐겨찾기 해제' : '즐겨찾기');
+          button.innerHTML = getRouteFavoriteIconHtml(favorited);
+        });
+      }
+
+      function loadRecentRouteFavorites() {
+        if (!authState.logged_in) {
+          recentFavoritesLoading = false;
+          recentFavoriteItems = [];
+          refreshIdleFavoritesPanelIfVisible();
+          return Promise.resolve([]);
+        }
+
+        recentFavoritesLoading = true;
+        refreshIdleFavoritesPanelIfVisible();
+        return fetchJson(API_BASE + '/api/me/route-favorites/recent?limit=6')
+          .then(function(result) {
+            if (!result.ok) throw new Error(result.data && result.data.error || '최근 즐겨찾기를 불러오지 못했습니다.');
+            recentFavoriteItems = Array.isArray(result.data && result.data.items) ? result.data.items : [];
+            return recentFavoriteItems;
+          })
+          .catch(function() {
+            recentFavoriteItems = [];
+            return [];
+          })
+          .finally(function() {
+            recentFavoritesLoading = false;
+            refreshIdleFavoritesPanelIfVisible();
+          });
+      }
+
+      function refreshVisibleRouteFavoriteStatuses(options) {
+        var routeIds = Array.isArray(options)
+          ? options
+              .map(function(option) { return normalizeRouteFavoriteId(option && option.route_id); })
+              .filter(function(routeId, index, list) { return routeId > 0 && list.indexOf(routeId) === index; })
+          : [];
+        var requestSeq = ++favoriteStatusRequestSeq;
+
+        if (!authState.logged_in || routeIds.length === 0) {
+          routeIds.forEach(function(routeId) {
+            setRouteFavorited(routeId, false);
+          });
+          syncRouteFavoriteButtonsInView();
+          return Promise.resolve([]);
+        }
+
+        return fetchJson(API_BASE + '/api/me/route-favorites/status?route_ids=' + encodeURIComponent(routeIds.join(',')))
+          .then(function(result) {
+            if (requestSeq !== favoriteStatusRequestSeq) return [];
+            if (!result.ok) throw new Error(result.data && result.data.error || '즐겨찾기 상태를 불러오지 못했습니다.');
+            var favoredRouteIds = Array.isArray(result.data && result.data.route_ids)
+              ? result.data.route_ids.map(normalizeRouteFavoriteId).filter(function(routeId) { return routeId > 0; })
+              : [];
+            routeIds.forEach(function(routeId) {
+              setRouteFavorited(routeId, favoredRouteIds.indexOf(routeId) >= 0);
+            });
+            syncRouteFavoriteButtonsInView();
+            return favoredRouteIds;
+          })
+          .catch(function() {
+            if (requestSeq !== favoriteStatusRequestSeq) return [];
+            routeIds.forEach(function(routeId) {
+              setRouteFavorited(routeId, false);
+            });
+            syncRouteFavoriteButtonsInView();
+            return [];
+          });
+      }
+
+      function ensureRouteFavoritesModal() {
+        if (
+          routeFavoritesModal &&
+          routeFavoritesModal.backdrop &&
+          document.body.contains(routeFavoritesModal.backdrop)
+        ) {
+          return routeFavoritesModal;
+        }
+
+        var backdrop = document.createElement('div');
+        backdrop.className = 'route-favorites-backdrop';
+        backdrop.setAttribute('aria-hidden', 'true');
+
+        var modal = document.createElement('div');
+        modal.className = 'route-favorites-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-label', '즐겨찾기');
+        modal.innerHTML =
+          '<div class="route-favorites-header">' +
+            '<div class="route-favorites-title">즐겨찾기</div>' +
+            '<button type="button" class="route-favorites-close" data-route-favorites-close="1" aria-label="닫기">×</button>' +
+          '</div>' +
+          '<div class="route-favorites-body"></div>';
+
+        backdrop.appendChild(modal);
+        document.body.appendChild(backdrop);
+
+        routeFavoritesModal = {
+          backdrop: backdrop,
+          modal: modal,
+          body: modal.querySelector('.route-favorites-body'),
+          closeButton: modal.querySelector('[data-route-favorites-close="1"]')
+        };
+
+        backdrop.addEventListener('click', function(evt) {
+          if (evt.target === backdrop) closeRouteFavoritesModal();
+        });
+        if (routeFavoritesModal.closeButton) {
+          routeFavoritesModal.closeButton.addEventListener('click', closeRouteFavoritesModal);
+        }
+        document.addEventListener('keydown', function(evt) {
+          if (!routeFavoritesModal || !routeFavoritesModal.backdrop) return;
+          if (!routeFavoritesModal.backdrop.classList.contains('show')) return;
+          if (evt.key === 'Escape') {
+            evt.preventDefault();
+            closeRouteFavoritesModal();
+          }
+        });
+        return routeFavoritesModal;
+      }
+
+      function renderRouteFavoritesModalBody() {
+        var modalRef = ensureRouteFavoritesModal();
+        var body = modalRef && modalRef.body;
+        if (!body) return;
+        body.innerHTML = '';
+
+        if (!authState.logged_in) {
+          var loginCard = document.createElement('div');
+          loginCard.className = 'route-favorites-login';
+          loginCard.innerHTML =
+            '<strong>즐겨찾기는 로그인 후 사용할 수 있습니다.</strong>' +
+            '<div>Google 계정으로 로그인하면 저장한 노선을 이곳에서 확인할 수 있습니다.</div>';
+          loginCard.appendChild(createGoogleLoginButton());
+          body.appendChild(loginCard);
+          return;
+        }
+
+        if (routeFavoritesModalLoading) {
+          var loadingEl = document.createElement('div');
+          loadingEl.className = 'route-favorites-loading';
+          loadingEl.textContent = '즐겨찾기를 불러오는 중입니다...';
+          body.appendChild(loadingEl);
+          return;
+        }
+
+        if (!Array.isArray(routeFavoritesModalItems) || routeFavoritesModalItems.length === 0) {
+          var emptyEl = document.createElement('div');
+          emptyEl.className = 'route-favorites-empty';
+          emptyEl.textContent = '저장된 즐겨찾기가 없습니다. 노선을 검색한 뒤 별 버튼으로 추가해 보세요.';
+          body.appendChild(emptyEl);
+          return;
+        }
+
+        routeFavoritesModalItems.forEach(function(item) {
+          var favorite = item || {};
+          var row = document.createElement('div');
+          row.className = 'route-favorite-item ' + (favorite.available === false ? 'unavailable' : 'available');
+
+          var infoRow = document.createElement('div');
+          infoRow.className = 'route-favorite-row';
+
+          var main = document.createElement('div');
+          main.className = 'route-favorite-main';
+
+          var name = document.createElement('div');
+          name.className = 'route-favorite-name';
+          name.textContent = String(favorite.route_name || '노선');
+          main.appendChild(name);
+
+          var summary = document.createElement('div');
+          summary.className = 'route-favorite-summary';
+          summary.textContent = buildFavoriteMetaText(favorite);
+          main.appendChild(summary);
+
+          var detail = document.createElement('div');
+          detail.className = 'route-favorite-detail';
+          detail.textContent = buildFavoriteRouteFlowText(favorite);
+          main.appendChild(detail);
+
+          if (favorite.available === false) {
+            var warning = document.createElement('div');
+            warning.className = 'route-favorite-warning';
+            warning.textContent = '현재 DB에서 해당 노선을 찾을 수 없지만 별 버튼으로 즐겨찾기를 해제할 수 있습니다.';
+            main.appendChild(warning);
+          }
+
+          var favoriteBtn = document.createElement('button');
+          favoriteBtn.type = 'button';
+          favoriteBtn.className = 'route-favorite-toggle';
+          favoriteBtn.setAttribute('aria-label', '즐겨찾기 해제');
+          favoriteBtn.setAttribute('title', '즐겨찾기 해제');
+          favoriteBtn.innerHTML = getRouteFavoriteIconHtml(true);
+          favoriteBtn.addEventListener('click', function(evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            deleteRouteFavoriteEntry(favorite.route_id, favoriteBtn);
+          });
+
+          infoRow.appendChild(main);
+          infoRow.appendChild(favoriteBtn);
+          row.appendChild(infoRow);
+          if (favorite.available !== false) {
+            row.addEventListener('click', function() {
+              openRouteFavoriteRoute(favorite.route_id, { source: 'modal' });
+            });
+          }
+          body.appendChild(row);
+        });
+      }
+
+      function closeRouteFavoritesModal() {
+        if (!routeFavoritesModal || !routeFavoritesModal.backdrop) return;
+        routeFavoritesModal.backdrop.classList.remove('show');
+        routeFavoritesModal.backdrop.setAttribute('aria-hidden', 'true');
+      }
+
+      function loadRouteFavoritesModalItems() {
+        ensureRouteFavoritesModal();
+        if (!authState.logged_in) {
+          routeFavoritesModalLoading = false;
+          routeFavoritesModalItems = [];
+          renderRouteFavoritesModalBody();
+          return Promise.resolve([]);
+        }
+
+        routeFavoritesModalLoading = true;
+        renderRouteFavoritesModalBody();
+        return fetchJson(API_BASE + '/api/me/route-favorites')
+          .then(function(result) {
+            if (!result.ok) throw new Error(result.data && result.data.error || '즐겨찾기를 불러오지 못했습니다.');
+            routeFavoritesModalItems = Array.isArray(result.data && result.data.items) ? result.data.items : [];
+            return routeFavoritesModalItems;
+          })
+          .catch(function(err) {
+            routeFavoritesModalItems = [];
+            alert(err && err.message ? err.message : '즐겨찾기를 불러오지 못했습니다.');
+            return [];
+          })
+          .finally(function() {
+            routeFavoritesModalLoading = false;
+            renderRouteFavoritesModalBody();
+          });
+      }
+
+      function openRouteFavoritesModal() {
+        var modalRef = ensureRouteFavoritesModal();
+        if (!modalRef || !modalRef.backdrop) return;
+        modalRef.backdrop.classList.add('show');
+        modalRef.backdrop.setAttribute('aria-hidden', 'false');
+        renderRouteFavoritesModalBody();
+        if (authState.logged_in) {
+          loadRouteFavoritesModalItems();
+        }
+      }
+
+      function refreshFavoriteSurfaces(opts) {
+        var options = opts || {};
+        var tasks = [];
+        if (options.reloadRecent !== false) {
+          tasks.push(loadRecentRouteFavorites());
+        }
+        if (
+          options.reloadModal !== false &&
+          routeFavoritesModal &&
+          routeFavoritesModal.backdrop &&
+          routeFavoritesModal.backdrop.classList.contains('show')
+        ) {
+          tasks.push(loadRouteFavoritesModalItems());
+        }
+        if (
+          options.refreshVisible !== false &&
+          routeOptionsWrap &&
+          routeOptionsWrap.classList.contains('show') &&
+          Array.isArray(currentRouteOptions) &&
+          currentRouteOptions.length > 0
+        ) {
+          tasks.push(refreshVisibleRouteFavoriteStatuses(currentRouteOptions));
+        } else {
+          syncRouteFavoriteButtonsInView();
+        }
+        refreshIdleFavoritesPanelIfVisible();
+        return Promise.allSettled(tasks);
+      }
+
+      function deleteRouteFavoriteEntry(routeId, buttonEl) {
+        var normalizedRouteId = normalizeRouteFavoriteId(routeId);
+        if (!normalizedRouteId || !authState.logged_in) return Promise.resolve(false);
+        if (buttonEl) buttonEl.disabled = true;
+        return fetchJson(API_BASE + '/api/me/route-favorites/' + encodeURIComponent(String(normalizedRouteId)), {
+          method: 'DELETE'
+        })
+          .then(function(result) {
+            if (!result.ok) throw new Error(result.data && result.data.error || '즐겨찾기를 삭제하지 못했습니다.');
+            setRouteFavorited(normalizedRouteId, false);
+            routeFavoritesModalItems = Array.isArray(routeFavoritesModalItems)
+              ? routeFavoritesModalItems.filter(function(item) {
+                  return normalizeRouteFavoriteId(item && item.route_id) !== normalizedRouteId;
+                })
+              : [];
+            recentFavoriteItems = Array.isArray(recentFavoriteItems)
+              ? recentFavoriteItems.filter(function(item) {
+                  return normalizeRouteFavoriteId(item && item.route_id) !== normalizedRouteId;
+                })
+              : [];
+            renderRouteFavoritesModalBody();
+            refreshIdleFavoritesPanelIfVisible();
+            syncRouteFavoriteButtonsInView();
+            return refreshFavoriteSurfaces({ reloadRecent: true, reloadModal: true, refreshVisible: true }).then(function() {
+              return true;
+            });
+          })
+          .catch(function(err) {
+            alert(err && err.message ? err.message : '즐겨찾기를 삭제하지 못했습니다.');
+            return false;
+          })
+          .finally(function() {
+            if (buttonEl) buttonEl.disabled = false;
+          });
+      }
+
+      function getRouteFavoriteIconHtml(favorited) {
+        var outlinePath = 'M12 3.75 14.705 9.232 20.755 10.111 16.377 14.378 17.41 20.403 12 17.559 6.59 20.403 7.623 14.378 3.245 10.111 9.295 9.232 12 3.75';
+        var solidPath = 'M12 3.75 14.705 9.232 20.755 10.111 16.377 14.378 17.41 20.403 12 17.559 6.59 20.403 7.623 14.378 3.245 10.111 9.295 9.232 12 3.75Z';
+        if (favorited) {
+          return '<svg class="route-favorite-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+            '<path d="' + solidPath + '" fill="currentColor"></path>' +
+          '</svg>';
+        }
+        return '<svg class="route-favorite-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+          '<path d="' + outlinePath + '" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path>' +
+        '</svg>';
+      }
+
+      function buildRouteFavoriteButtonHtml(option) {
+        var routeId = normalizeRouteFavoriteId(option && option.route_id);
+        var favorited = isRouteFavorited(routeId);
+        return '<button type="button" class="btn-route-favorite' + (favorited ? ' active' : '') + '"' +
+          ' data-route-id="' + escapeAttr(routeId) + '"' +
+          ' aria-pressed="' + (favorited ? 'true' : 'false') + '"' +
+          ' aria-label="' + (favorited ? '즐겨찾기 해제' : '즐겨찾기') + '"' +
+          ' title="' + (favorited ? '즐겨찾기 해제' : '즐겨찾기') + '">' +
+          getRouteFavoriteIconHtml(favorited) +
+        '</button>';
+      }
+
+      function toggleRouteFavorite(option, card, buttonEl) {
+        if (!option || !buttonEl) return;
+        var routeId = normalizeRouteFavoriteId(option.route_id);
+        if (!routeId) {
+          alert('즐겨찾기할 노선 정보를 찾지 못했습니다.');
+          return;
+        }
+        if (promptGoogleLoginForFavorites()) return;
+        if (buttonEl.disabled) return;
+
+        var currentlyFavorited = isRouteFavorited(routeId);
+        buttonEl.disabled = true;
+
+        var requestPromise;
+        if (currentlyFavorited) {
+          requestPromise = fetchJson(API_BASE + '/api/me/route-favorites/' + encodeURIComponent(String(routeId)), {
+            method: 'DELETE'
+          }).then(function(result) {
+            if (!result.ok) throw new Error(result.data && result.data.error || '즐겨찾기를 해제하지 못했습니다.');
+            setRouteFavorited(routeId, false);
+          });
+        } else {
+          var snapshot = buildRouteShareSnapshot(option, card);
+          if (!snapshot) {
+            buttonEl.disabled = false;
+            alert('즐겨찾기할 노선 정보를 준비하지 못했습니다.');
+            return;
+          }
+          requestPromise = fetchJson(API_BASE + '/api/me/route-favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ snapshot: snapshot })
+          }).then(function(result) {
+            if (!result.ok) throw new Error(result.data && result.data.error || '즐겨찾기를 저장하지 못했습니다.');
+            setRouteFavorited(routeId, true);
+          });
+        }
+
+        requestPromise
+          .then(function() {
+            syncRouteFavoriteButtonsInView();
+            return refreshFavoriteSurfaces({ reloadRecent: true, reloadModal: true, refreshVisible: true });
+          })
+          .catch(function(err) {
+            alert(err && err.message ? err.message : '즐겨찾기 처리에 실패했습니다.');
+            return refreshVisibleRouteFavoriteStatuses(currentRouteOptions || []);
+          })
+          .finally(function() {
+            buttonEl.disabled = false;
+            syncRouteFavoriteButtonsInView();
+          });
+      }
+
+      function handleFavoritesAfterAuthRefresh() {
+        favoriteStatusRequestSeq += 1;
+        if (!authState.logged_in) {
+          favoriteStatusByRouteId = {};
+          recentFavoritesLoading = false;
+          recentFavoriteItems = [];
+          routeFavoritesModalLoading = false;
+          routeFavoritesModalItems = [];
+          syncRouteFavoriteButtonsInView();
+          if (routeFavoritesModal) renderRouteFavoritesModalBody();
+          refreshIdleFavoritesPanelIfVisible();
+          return Promise.resolve();
+        }
+
+        return Promise.allSettled([
+          loadRecentRouteFavorites(),
+          refreshVisibleRouteFavoriteStatuses(currentRouteOptions || [])
+        ]).then(function() {
+          if (routeFavoritesModal) renderRouteFavoritesModalBody();
+        });
       }
 
       var accountMenuAnchor = null;
@@ -9458,6 +10650,216 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         endpointOptions = endpointOptionsAll.slice();
         persistCurrentEndpointSelection({ saveRemote: false });
         updateEndpointTriggerText();
+      }
+
+      function fetchResolvedEndpointSelection(siteId, dayType, direction, selectedEndpoints) {
+        var url = API_BASE + '/api/shuttle/endpoint-options' +
+          '?site_id=' + encodeURIComponent(String(siteId || '')) +
+          '&day_type=' + encodeURIComponent(String(dayType || '')) +
+          '&direction=' + encodeURIComponent(String(direction || '')) +
+          '&resolve_selected=1';
+        if (Array.isArray(selectedEndpoints)) {
+          url += '&selected_endpoints=' + encodeURIComponent(selectedEndpoints.join(','));
+        }
+        return fetchJson(url).then(function(result) {
+          if (!result.ok) {
+            throw new Error(result.data && result.data.error || 'endpoint 옵션을 불러오지 못했습니다.');
+          }
+          var payload = result.data || {};
+          endpointOptionsPayloadBySiteDay[getEndpointSiteDayKey(siteId, dayType)] = payload;
+          return payload;
+        });
+      }
+
+      function applyExplicitEndpointSelectionState(direction, endpointOptionsRaw, selectedNames) {
+        endpointContextKey = getEndpointContextKey(direction || 'depart');
+        endpointOptionsAll = Array.isArray(endpointOptionsRaw)
+          ? endpointOptionsRaw
+              .map(mapEndpointOption)
+              .filter(function(item) {
+                return getEndpointOptionKey(item).length > 0 || item.endpoint_name.length > 0;
+              })
+          : [];
+        resetEndpointSearch();
+
+        var available = new Set(endpointOptionsAll.map(function(item) { return getEndpointOptionKey(item); }));
+        var nextSelected = new Set();
+        if (Array.isArray(selectedNames) && selectedNames.length > 0) {
+          selectedNames.forEach(function(name) {
+            var value = String(name || '').trim();
+            if (value && available.has(value)) nextSelected.add(value);
+          });
+        }
+        if (nextSelected.size === 0) {
+          endpointOptionsAll.forEach(function(item) {
+            var key = getEndpointOptionKey(item);
+            if (key) nextSelected.add(key);
+          });
+        }
+        selectedEndpoints = nextSelected;
+        endpointDraftEndpoints = null;
+        persistCurrentEndpointSelection({ saveRemote: false });
+        updateEndpointTriggerText();
+        updateRouteModeHeader();
+      }
+
+      function ensureContextDayTypeSelected(dayType) {
+        var desiredDayType = String(dayType || '').trim();
+        if (!desiredDayType) return;
+        var hasDesired = DAY_TYPE_OPTIONS.some(function(option) {
+          return String(option && option.value || '') === desiredDayType;
+        });
+        if (!hasDesired) {
+          var values = DAY_TYPE_OPTIONS.map(function(option) {
+            return String(option && option.value || '').trim();
+          }).filter(function(value) { return value.length > 0; });
+          values.push(desiredDayType);
+          applyAvailableDayTypes(values);
+        }
+        selectedDayType = desiredDayType;
+        pendingDayType = desiredDayType;
+      }
+
+      function applyResolvedRouteSearchContext(context, endpointState) {
+        var resolvedContext = context || {};
+        var siteId = String(resolvedContext.site_id || selectedSiteId || '').trim();
+        var dayType = String(resolvedContext.day_type || selectedDayType || 'weekday').trim() || 'weekday';
+        var direction = String(resolvedContext.direction || 'depart').trim().toLowerCase() === 'arrive'
+          ? 'arrive'
+          : 'depart';
+        var departureText = String(resolvedContext.departure_time || '').trim();
+        var place = resolvedContext.place && typeof resolvedContext.place === 'object'
+          ? resolvedContext.place
+          : {};
+        var placeName = String(resolvedContext.place_name || place.place_name || '선택한 장소').trim() || '선택한 장소';
+        var placeSource = String(resolvedContext.place_source || 'unknown').trim().toLowerCase();
+        var lat = Number(place.lat);
+        var lng = Number(place.lng);
+        if (!isFinite(lat) || !isFinite(lng)) {
+          return Promise.reject(new Error('저장된 위치 정보를 복원하지 못했습니다.'));
+        }
+
+        if (siteId) {
+          if (siteOptionExists(siteId)) {
+            if (siteSelect && siteSelect.value !== siteId) siteSelect.value = siteId;
+          }
+          selectedSiteId = siteId;
+          updateSiteTriggerText();
+        }
+
+        return refreshDayTypeOptionsForSite(selectedSiteId || siteId || '0000011')
+          .catch(function() { return true; })
+          .then(function() {
+            ensureContextDayTypeSelected(dayType);
+            var timeMatch = departureText.match(/^(\d{1,2}):(\d{2})$/);
+            if (timeMatch) {
+              departureTime.h = Math.max(0, Math.min(23, Number(timeMatch[1]) || 0));
+              departureTime.m = Math.max(0, Math.min(59, Number(timeMatch[2]) || 0));
+            }
+            updateDepartureTriggerText();
+
+            activeRouteSearchMode = normalizeRouteSearchMode(resolvedContext.route_search_mode || activeRouteSearchMode);
+            currentRouteSearchModeUsed = activeRouteSearchMode;
+            maxDistanceKm = normalizeRouteMaxDistanceKm(resolvedContext.max_distance_km);
+            maxDistancePendingKm = maxDistanceKm;
+            routeMaxDistanceSessionDirty = true;
+            updateMaxDistanceUi();
+
+            applyExplicitEndpointSelectionState(
+              direction,
+              endpointState && endpointState.endpoint_options,
+              endpointState && endpointState.resolved_selected_endpoints
+            );
+
+            currentPlaceSource = (placeSource === 'search' || placeSource === 'map') ? placeSource : 'unknown';
+            lastPlace = {
+              place_name: placeName,
+              address_name: String(place.address_name || ''),
+              x: String(lng),
+              y: String(lat),
+              _place_source: currentPlaceSource,
+              place_source: currentPlaceSource
+            };
+            lastShuttleType = direction;
+            currentPlaceName = placeName;
+            return {
+              place: lastPlace,
+              placeName: placeName,
+              direction: direction
+            };
+          });
+      }
+
+      function openRouteFavoriteRoute(routeId, opts) {
+        var normalizedRouteId = normalizeRouteFavoriteId(routeId);
+        if (!normalizedRouteId) return Promise.resolve(false);
+        if (promptGoogleLoginForFavorites()) return Promise.resolve(false);
+
+        var requestSeq = ++favoriteResolveRequestSeq;
+        if (sharedRouteState.active) {
+          deactivateSharedRouteView();
+        } else {
+          clearPendingSharedRouteUrl();
+        }
+        showSharedRouteStateCard('즐겨찾기', '즐겨찾기한 노선을 불러오는 중입니다...', { panelTitle: '즐겨찾기' });
+
+        return fetchJson(API_BASE + '/api/me/route-favorites/' + encodeURIComponent(String(normalizedRouteId)) + '/resolve')
+          .then(function(result) {
+            if (requestSeq !== favoriteResolveRequestSeq) return false;
+
+            if (result.status === 410) {
+              routeFavoritesModalItems = Array.isArray(routeFavoritesModalItems)
+                ? routeFavoritesModalItems.map(function(item) {
+                    if (normalizeRouteFavoriteId(item && item.route_id) !== normalizedRouteId) return item;
+                    var copied = Object.assign({}, item || {});
+                    copied.available = false;
+                    return copied;
+                  })
+                : [];
+              recentFavoriteItems = Array.isArray(recentFavoriteItems)
+                ? recentFavoriteItems.map(function(item) {
+                    if (normalizeRouteFavoriteId(item && item.route_id) !== normalizedRouteId) return item;
+                    var copied = Object.assign({}, item || {});
+                    copied.available = false;
+                    return copied;
+                  })
+                : [];
+              renderRouteFavoritesModalBody();
+              refreshIdleFavoritesPanelIfVisible();
+              alert(result.data && result.data.error ? result.data.error : '해당 노선은 더 이상 존재하지 않습니다.');
+              return false;
+            }
+            if (!result.ok) {
+              throw new Error(result.data && result.data.error || '즐겨찾기한 노선을 불러오지 못했습니다.');
+            }
+
+            var resolvedContext = result.data && result.data.resolved_context || {};
+            var routeOption = cloneJsonValue(result.data && result.data.route_option || null);
+            if (!routeOption || typeof routeOption !== 'object') {
+              throw new Error('최신 노선 정보를 복원하지 못했습니다.');
+            }
+            applyRouteCollectorUpdatedAt(result.data || {}, routeOption);
+            return applyResolvedRouteSearchContext(resolvedContext, {
+              endpoint_options: result.data && result.data.endpoint_options || [],
+              resolved_selected_endpoints: resolvedContext.selected_endpoints || []
+            }).then(function(contextState) {
+              var isDepart = contextState.direction === 'depart';
+              var options = [routeOption];
+              options._searchMode = normalizeRouteSearchMode(resolvedContext.route_search_mode || activeRouteSearchMode);
+              closeRouteFavoritesModal();
+              renderRouteOptions(options, contextState.placeName, isDepart, '', isMobile());
+              return true;
+            });
+          })
+          .catch(function(err) {
+            if (requestSeq !== favoriteResolveRequestSeq) return false;
+            showSharedRouteStateCard(
+              '즐겨찾기 오류',
+              err && err.message ? err.message : '즐겨찾기한 노선을 불러오지 못했습니다.',
+              { showHomeButton: false, panelTitle: '즐겨찾기' }
+            );
+            return false;
+          });
       }
 
       function resetEndpointSearch() {
@@ -12268,7 +13670,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             setSelectedSiteValue(resolveInitialSiteId());
             siteListLoaded = true;
             setSiteSelectorEnabled(true);
-            return refreshDayTypeOptionsForSite(selectedSiteId);
+            return refreshDayTypeOptionsForSite(selectedSiteId).then(function(result) {
+              refreshIdleFavoritesPanelIfVisible();
+              return result;
+            });
           })
           .catch(function() {
             siteSelect.innerHTML = '';
@@ -12276,7 +13681,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             setSelectedSiteValue('0000011');
             siteListLoaded = true;
             setSiteSelectorEnabled(true);
-            return refreshDayTypeOptionsForSite(selectedSiteId);
+            return refreshDayTypeOptionsForSite(selectedSiteId).then(function(result) {
+              refreshIdleFavoritesPanelIfVisible();
+              return result;
+            });
           });
       }
 
@@ -14395,6 +15803,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
 
       function renderResults(list) {
         showPlaceResultsView();
+        resultsPanelState = 'places';
         deselectPlace();
         resultsPlaceholder.style.display = 'none';
         resultsList.style.display = 'flex';
@@ -16067,7 +17476,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         clearShuttleOverlays();
         hideShuttleErrorOverlay();
         shuttleMessage.classList.remove('show');
-        if (panelTitle) panelTitle.textContent = '공유 링크';
+        if (panelTitle) panelTitle.textContent = String(opts.panelTitle || '공유 링크');
         var btnBack = document.getElementById('btnBackFromRoutes');
         if (btnBack) btnBack.style.display = 'none';
         if (resultsPlaceholder) resultsPlaceholder.style.display = 'none';
@@ -16260,17 +17669,26 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var lat = Number(place.lat);
         var lng = Number(place.lng);
         if (!isFinite(lat) || !isFinite(lng)) return;
-        runRouteSearchWithPlace(
-          {
-            place_name: String(place.place_name || '선택한 장소'),
-            x: String(lng),
-            y: String(lat),
-            _place_source: String(snapshot.place_source || 'unknown'),
-            place_source: String(snapshot.place_source || 'unknown')
-          },
-          String(snapshot.direction || 'depart'),
-          { preserveSheetState: isMobile(), placeSource: String(snapshot.place_source || 'unknown') }
-        );
+        var siteId = String(snapshot.site_id || selectedSiteId || '').trim();
+        var dayType = String(snapshot.day_type || selectedDayType || 'weekday').trim() || 'weekday';
+        var direction = String(snapshot.direction || 'depart').trim().toLowerCase() === 'arrive' ? 'arrive' : 'depart';
+        fetchResolvedEndpointSelection(siteId, dayType, direction, Array.isArray(snapshot.selected_endpoints) ? snapshot.selected_endpoints : [])
+          .then(function(endpointPayload) {
+            return applyResolvedRouteSearchContext(snapshot, {
+              endpoint_options: endpointPayload.endpoint_options || [],
+              resolved_selected_endpoints: endpointPayload.resolved_selected_endpoints || []
+            });
+          })
+          .then(function(contextState) {
+            runRouteSearchWithPlace(
+              contextState.place,
+              contextState.direction,
+              { preserveSheetState: isMobile(), placeSource: currentPlaceSource }
+            );
+          })
+          .catch(function(err) {
+            showShuttleError(err && err.message ? err.message : '최신 정보 검색에 실패했습니다.');
+          });
       }
 
       function loadSharedRouteSnapshot(token) {
@@ -16751,6 +18169,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
                 '<div class="route-meta">' + escapeHtml(buildRouteMetaLineText(opt, isDepart)) + '</div>' +
               '</div>' +
               '<div class="route-card-actions">' +
+                buildRouteFavoriteButtonHtml(opt) +
                 '<button type="button" class="btn-route-detail" data-idx="' + idx + '">상세</button>' +
                 (showShareButton
                   ? '<button type="button" class="btn-route-share" data-idx="' + idx + '" data-default-label="↗ 공유">↗ 공유</button>'
@@ -16774,6 +18193,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               (optionUpdatedAt ? '<div class="route-db-updated">마지막 업데이트: ' + escapeHtml(optionUpdatedAt) + '</div>' : '') +
             '</div>';
           var btnDetail = card.querySelector('.btn-route-detail');
+          var btnFavorite = card.querySelector('.btn-route-favorite');
           var btnShare = card.querySelector('.btn-route-share');
           var toggleRouteDetail = function() {
             if (expandedOptionIndex === idx) {
@@ -16783,7 +18203,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             activateRouteCardDetailView(card, opt, placeName, isDepart, idx, null, false);
           };
           card.addEventListener('click', function(e) {
-            if (e.target.closest('.btn-route-detail') || e.target.closest('.btn-route-share')) return;
+            if (e.target.closest('.btn-route-detail') || e.target.closest('.btn-route-favorite') || e.target.closest('.btn-route-share')) return;
             if (e.target.closest('.route-detail-panel')) return;
             var isCardActive = card.classList.contains('selected') || card.classList.contains('expanded');
             if (!isCardActive) {
@@ -16796,6 +18216,12 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             e.stopPropagation();
             toggleRouteDetail();
           });
+          if (btnFavorite) {
+            btnFavorite.addEventListener('click', function(e) {
+              e.stopPropagation();
+              toggleRouteFavorite(opt, card, btnFavorite);
+            });
+          }
           if (btnShare) {
             btnShare.addEventListener('click', function(e) {
               e.stopPropagation();
@@ -16930,6 +18356,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function showPlaceResultsView() {
         routeRequestSerial += 1;
         activeOptionDrawToken += 1;
+        resultsPanelState = 'idle';
         setRouteMode(false);
         panelTitle.textContent = '검색 결과';
         var btnBack = document.getElementById('btnBackFromRoutes');
@@ -16968,9 +18395,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           resultsList.style.display = 'flex';
           resultsPlaceholder.style.display = 'none';
         } else {
-          resultsPlaceholder.style.display = 'block';
-          resultsPlaceholder.textContent = '검색어를 입력한 뒤 검색하면 여기에 표시됩니다.';
-          resultsList.style.display = 'none';
+          refreshIdleFavoritesPanelIfVisible();
         }
       }
 
@@ -17067,6 +18492,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       }
 
       function showEmptyResults() {
+        resultsPanelState = 'empty';
         resultsPlaceholder.style.display = 'block';
         resultsPlaceholder.textContent = '검색 결과가 없습니다.';
         resultsList.style.display = 'none';
@@ -20873,6 +22299,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           enhanceRouteDetailPanel(card, option, placeName, isDepart);
           syncRouteCardTimeSummary(card, option, placeName, isDepart);
         });
+        refreshVisibleRouteFavoriteStatuses(options || []);
       };
 
       if (btnArrivalReport) {
@@ -20947,6 +22374,12 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         accountMenuLeaderboardBtn.addEventListener('click', function() {
           closeAccountMenu();
           openLeaderboardModal(reportDataState.leaderboardWindow || 'all');
+        });
+      }
+      if (accountMenuFavoritesBtn) {
+        accountMenuFavoritesBtn.addEventListener('click', function() {
+          closeAccountMenu();
+          openRouteFavoritesModal();
         });
       }
       if (accountMenuSettingsBtn) {
