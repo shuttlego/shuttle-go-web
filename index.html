@@ -4105,10 +4105,9 @@
       color: #fff;
       border-color: #333;
     }
-    .route-option-card .route-mode-btn.loading,
-    .route-option-card .route-mode-btn:disabled {
+    .route-option-card .route-mode-btn.loading {
       opacity: 0.7;
-      cursor: wait;
+      cursor: pointer;
     }
     .route-option-card .route-mode-btn-icon {
       width: 14px;
@@ -4124,6 +4123,15 @@
     .route-option-card .route-mode-btn-label {
       line-height: 1;
       white-space: nowrap;
+    }
+    .route-option-card .route-mode-btn-check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      font-size: 11px;
+      font-weight: 700;
+      flex: 0 0 auto;
     }
     .route-option-card .route-time-summary-head,
     .route-option-card .route-time-summary-body {
@@ -16710,6 +16718,109 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return buildRouteShuttleConnectorText(routeName, durationText, shuttleStopMoveCount);
       }
 
+      function getTransitAccessTimeBounds(transitOption) {
+        var accessLegs = Array.isArray(transitOption && transitOption.access_legs) ? transitOption.access_legs : [];
+        var startTime = '';
+        var endTime = '';
+        accessLegs.forEach(function(leg) {
+          var nextStart = String(leg && leg.start_time || '').trim();
+          var nextEnd = String(leg && leg.end_time || '').trim();
+          if (!startTime && nextStart) startTime = nextStart;
+          if (nextEnd) endTime = nextEnd;
+        });
+        return {
+          start_time: startTime,
+          end_time: endTime
+        };
+      }
+
+      function hydrateTransitOptionEtaFromRoute(option, isDepart, transitOption) {
+        if (!transitOption || typeof transitOption !== 'object') return null;
+        var data = cloneJsonValue(transitOption) || {};
+        var routeStops = getRouteStopsForTransitDisplay(option);
+        if (!Array.isArray(routeStops) || routeStops.length === 0) return data;
+        var resolvedStops = resolveRouteSummaryStops(routeStops, option, isDepart);
+        var boardStop = resolvedStops && resolvedStops.boardStop ? resolvedStops.boardStop : null;
+        var alightStop = resolvedStops && resolvedStops.alightStop ? resolvedStops.alightStop : null;
+        if (!boardStop || !alightStop) return data;
+        if (!boardStop.eta_has_evidence || !alightStop.eta_has_evidence) return data;
+
+        var boardAt = String(data.shuttle_board_at || boardStop.eta_time || boardStop.eta_display || '').trim();
+        var alightAt = String(data.shuttle_alight_at || alightStop.eta_time || alightStop.eta_display || '').trim();
+        if (!boardAt || !alightAt) return data;
+
+        var shuttleMinutes = getForwardClockDiffMinutes(boardAt, alightAt);
+        if (shuttleMinutes == null || shuttleMinutes <= 0) return data;
+
+        var accessDurationSec = getTransitOptionAccessDurationSec(data);
+        var accessBounds = getTransitAccessTimeBounds(data);
+        var accessStartTime = String(accessBounds.start_time || '').trim();
+        var accessEndTime = String(accessBounds.end_time || '').trim();
+        var waitMinutes = 0;
+        if (isDepart && accessEndTime) {
+          var nextWaitMinutes = getForwardClockDiffMinutes(accessEndTime, boardAt);
+          if (nextWaitMinutes != null && nextWaitMinutes >= 0 && nextWaitMinutes <= 180) {
+            waitMinutes = nextWaitMinutes;
+          }
+        }
+        var waitDurationSec = waitMinutes * 60;
+        var shuttleDurationSec = shuttleMinutes * 60;
+        var rangeStartTime = '';
+        var rangeEndTime = '';
+        if (isDepart) {
+          rangeStartTime = accessStartTime || addClockMinutes(
+            boardAt,
+            -Math.ceil((accessDurationSec + waitDurationSec) / 60)
+          );
+          rangeEndTime = alightAt;
+        } else {
+          rangeStartTime = boardAt;
+          rangeEndTime = accessEndTime || addClockMinutes(
+            alightAt,
+            Math.ceil(accessDurationSec / 60)
+          );
+        }
+
+        data.has_eta = true;
+        data.route_name = String(data.route_name || (option && option.route_name) || '').trim();
+        data.access_duration_sec = accessDurationSec;
+        data.shuttle_duration_sec = shuttleDurationSec;
+        data.shuttle_board_at = boardAt;
+        data.shuttle_alight_at = alightAt;
+        data.total_duration_sec = Math.max(
+          1,
+          accessDurationSec + shuttleDurationSec + (isDepart ? waitDurationSec : 0)
+        );
+        data.range_start_time = String(rangeStartTime || '').trim();
+        data.range_end_time = String(rangeEndTime || '').trim();
+        data.access_summary_text = buildTransitAccessSummaryText(data.access_legs, accessDurationSec);
+        data.shuttle_summary_text = buildTransitShuttleSummaryText(
+          data.route_name,
+          shuttleDurationSec,
+          true,
+          resolveRouteShuttleStopMoveCount(routeStops, option, isDepart, resolvedStops)
+        );
+
+        var timelinePoints = Array.isArray(data.timeline_points) ? cloneJsonValue(data.timeline_points) || [] : [];
+        if (timelinePoints.length >= 3) {
+          if (isDepart) {
+            timelinePoints[0].time = data.range_start_time;
+            timelinePoints[1].time = boardAt;
+            timelinePoints[2].time = alightAt;
+            timelinePoints[1].name = String(resolvedStops.boardName || timelinePoints[1].name || '').trim();
+            timelinePoints[2].name = String(resolvedStops.alightName || timelinePoints[2].name || '').trim();
+          } else {
+            timelinePoints[0].time = boardAt;
+            timelinePoints[1].time = alightAt;
+            timelinePoints[2].time = data.range_end_time;
+            timelinePoints[0].name = String(resolvedStops.boardName || timelinePoints[0].name || '').trim();
+            timelinePoints[1].name = String(resolvedStops.alightName || timelinePoints[1].name || '').trim();
+          }
+        }
+        data.timeline_points = timelinePoints;
+        return data;
+      }
+
       function getTransitAccessDisplayKind(leg) {
         if (!leg || typeof leg !== 'object') return 'walk';
         if (String(leg.kind || '').trim().toLowerCase() === 'walk') return 'walk';
@@ -16910,7 +17021,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       }
 
       function buildTransitTimelineData(option, placeName, isDepart, transitOption) {
-        var data = transitOption || getSelectedTransitOption(option);
+        var data = hydrateTransitOptionEtaFromRoute(option, isDepart, transitOption || getSelectedTransitOption(option));
         if (!data || typeof data !== 'object') return null;
         var hasEta = !!data.has_eta;
         var totalMinutes = Math.max(1, Math.round((Number(data.total_duration_sec || 0) || 0) / 60) || 1);
@@ -17140,7 +17251,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             type: type,
             duration_min: durationMin,
             candidate_label: candidateLabel,
-            icon_required: type === 'transit-bus' || type === 'transit' || type === 'subway',
+            icon_required: type === 'bus' || type === 'transit-bus' || type === 'transit' || type === 'subway',
             label_need_px: Math.max(22, 10 + candidateLabel.length * 8),
             estimated_width_px: 0,
             keep_icon: false,
@@ -19885,6 +19996,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           total_duration_sec: Number(option.total_duration_sec || 0) || 0,
           access_duration_sec: Number(option.access_duration_sec || 0) || 0,
           shuttle_duration_sec: Number(option.shuttle_duration_sec || 0) || 0,
+          shuttle_board_at: String(option.shuttle_board_at || '').trim(),
+          shuttle_alight_at: String(option.shuttle_alight_at || '').trim(),
           range_start_time: String(option.range_start_time || '').trim(),
           range_end_time: String(option.range_end_time || '').trim(),
           timeline_points: Array.isArray(option.timeline_points) ? cloneJsonValue(option.timeline_points) || [] : [],
@@ -19936,6 +20049,11 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         if (String(state.selected_mode || '').trim() !== 'transit') {
           return buildDefaultRouteModeState();
         }
+        state.transit_options = Array.isArray(state.transit_options)
+          ? state.transit_options.map(function(item) {
+              return sanitizeTransitOptionForShare(hydrateTransitOptionEtaFromRoute(option, !!currentIsDepart, item));
+            }).filter(Boolean).slice(0, 5)
+          : [];
         return normalizeRouteModeStateSnapshot(state);
       }
 
@@ -19959,6 +20077,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         state.selected_mode = 'walk';
         state.selected_transit_option_id = '';
         if (!preserveOptions) {
+          option.__transitCollectionComplete = false;
           state.transit_query_date = '';
           state.transit_query_time = '';
           state.transit_options = [];
@@ -19985,13 +20104,16 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return found || null;
       }
 
-      function setTransitOptionsForRoute(option, payload) {
+      function setTransitOptionsForRoute(option, payload, isDepart) {
         if (!option || typeof option !== 'object') return buildDefaultRouteModeState();
         var state = ensureRouteModeState(option);
+        option.__transitCollectionComplete = true;
         state.transit_query_date = String(payload && payload.query_date || '').trim();
         state.transit_query_time = String(payload && payload.query_time || '').trim();
         state.transit_options = Array.isArray(payload && payload.options)
-          ? payload.options.map(sanitizeTransitOptionForShare).filter(Boolean).slice(0, 5)
+          ? payload.options.map(function(item) {
+              return sanitizeTransitOptionForShare(hydrateTransitOptionEtaFromRoute(option, isDepart, item));
+            }).filter(Boolean).slice(0, 5)
           : [];
         if (state.transit_options.length === 0) {
           state.selected_mode = 'walk';
@@ -20003,6 +20125,13 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         }
         persistRouteModeState(option);
         return state;
+      }
+
+      function hasCompletedTransitCollection(option) {
+        if (!option || typeof option !== 'object') return false;
+        if (option.__transitCollectionComplete) return true;
+        var state = ensureRouteModeState(option);
+        return Array.isArray(state.transit_options) && state.transit_options.length > 0;
       }
 
       function setSelectedRouteMode(option, mode, transitOptionId) {
@@ -20076,19 +20205,22 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           getDepartureTimeStr()
         ).trim();
         var routeStops = Array.isArray(option.route_stops) ? option.route_stops : [];
-        var selectedOperator = String(option.operator || '').trim();
         if (!routeStopsHaveVariantDetail(routeStops)) {
+          routeStops = [];
+        }
+        var selectedOperator = String(option.operator || '').trim();
+        if (routeStops.length === 0) {
           var cachedDetail = getRouteVariantDetailCache(
             buildRouteVariantDetailCacheKey(option.route_id, selectedDayType, selectedTime)
           );
-          if (cachedDetail && routeStopsHaveVariantDetail(cachedDetail.route_stops || [])) {
+          if (cachedDetail && Array.isArray(cachedDetail.route_stops) && cachedDetail.route_stops.length > 0) {
             routeStops = Array.isArray(cachedDetail.route_stops) ? cachedDetail.route_stops : [];
             if (!selectedOperator) {
               selectedOperator = String(cachedDetail.selected_operator || '').trim();
             }
           }
         }
-        if (!routeStopsHaveVariantDetail(routeStops)) return null;
+        if (!Array.isArray(routeStops) || routeStops.length === 0) return null;
         return {
           selected_departure_time: selectedTime,
           route_stops: cloneJsonValue(routeStops),
@@ -20173,7 +20305,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         }
       }
 
-      function buildTransitOptionsResponseFromRouteState(option) {
+      function buildTransitOptionsResponseFromRouteState(option, isDepart) {
         var state = ensureRouteModeState(option);
         if (!Array.isArray(state.transit_options) || state.transit_options.length === 0) return null;
         return {
@@ -20182,7 +20314,9 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           query_time: String(state.transit_query_time || '').trim(),
           cache_status: 'state',
           code: 'ok',
-          options: cloneJsonValue(state.transit_options) || []
+          options: (cloneJsonValue(state.transit_options) || []).map(function(item) {
+            return hydrateTransitOptionEtaFromRoute(option, isDepart, item);
+          }).filter(Boolean)
         };
       }
 
@@ -20259,8 +20393,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return null;
       }
 
-      function fetchTransitOptionsForRoute(option, card) {
-        var statePayload = buildTransitOptionsResponseFromRouteState(option);
+      function fetchTransitOptionsForRoute(option, card, isDepart) {
+        var statePayload = buildTransitOptionsResponseFromRouteState(option, isDepart);
         if (statePayload) {
           return Promise.resolve(cloneJsonValue(statePayload) || statePayload);
         }
@@ -20273,8 +20407,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var cacheKey = buildTransitOptionsCacheKey(snapshot);
         var cached = getTransitOptionsCache(cacheKey);
         if (cached) {
-          setTransitOptionsForRoute(option, cached);
-          return Promise.resolve(cached);
+          setTransitOptionsForRoute(option, cached, isDepart);
+          return Promise.resolve(buildTransitOptionsResponseFromRouteState(option, isDepart));
         }
         if (cacheKey && transitOptionsPending.has(cacheKey)) {
           return transitOptionsPending.get(cacheKey).then(function(value) {
@@ -20297,11 +20431,11 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             if (!String(data.code || '').trim()) {
               data.code = (Array.isArray(data.options) && data.options.length > 0) ? 'ok' : 'empty_itineraries';
             }
-            setTransitOptionsForRoute(option, data);
+            setTransitOptionsForRoute(option, data, isDepart);
             if (cacheKey) {
               setTransitOptionsCache(cacheKey, data);
             }
-            return cloneJsonValue(data) || data;
+            return buildTransitOptionsResponseFromRouteState(option, isDepart) || cloneJsonValue(data) || data;
           })
           .finally(function() {
             if (cacheKey) transitOptionsPending.delete(cacheKey);
@@ -20376,13 +20510,14 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return total;
       }
 
-      function getTransitOptionPickerTotalDurationSec(transitOption) {
-        if (!transitOption || typeof transitOption !== 'object') return 0;
-        if (transitOption.has_eta) {
-          var totalDurationSec = Number(transitOption.total_duration_sec || 0);
+      function getTransitOptionPickerTotalDurationSec(transitOption, option, isDepart) {
+        var data = hydrateTransitOptionEtaFromRoute(option, isDepart, transitOption);
+        if (!data || typeof data !== 'object') return 0;
+        if (data.has_eta) {
+          var totalDurationSec = Number(data.total_duration_sec || 0);
           if (isFinite(totalDurationSec) && totalDurationSec > 0) return totalDurationSec;
         }
-        return getTransitOptionAccessDurationSec(transitOption);
+        return getTransitOptionAccessDurationSec(data);
       }
 
       function getTransitOptionAccessDistanceM(transitOption) {
@@ -20426,17 +20561,18 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return 320;
       }
 
-      function buildTransitPickerTimeBarSegments(transitOption, isDepart) {
-        var accessLegs = Array.isArray(transitOption && transitOption.access_legs) ? transitOption.access_legs : [];
+      function buildTransitPickerTimeBarSegments(transitOption, option, isDepart) {
+        var data = hydrateTransitOptionEtaFromRoute(option, isDepart, transitOption);
+        var accessLegs = Array.isArray(data && data.access_legs) ? data.access_legs : [];
         var includeShuttleSegment = !!(
-          transitOption &&
-          transitOption.has_eta &&
-          isFinite(Number(transitOption.shuttle_duration_sec || 0)) &&
-          Number(transitOption.shuttle_duration_sec || 0) > 0
+          data &&
+          data.has_eta &&
+          isFinite(Number(data.shuttle_duration_sec || 0)) &&
+          Number(data.shuttle_duration_sec || 0) > 0
         );
         var widthEstimate = getTransitPickerTimeBarWidthEstimate();
         var rawSegments = includeShuttleSegment
-          ? buildTransitTimelineSegments(transitOption, isDepart, true)
+          ? buildTransitTimelineSegments(data, isDepart, true)
           : accessLegs.map(function(leg) {
               var durationSec = Number(leg && leg.duration_sec || 0);
               if (!isFinite(durationSec) || durationSec <= 0) return null;
@@ -20459,7 +20595,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             type: type,
             duration_min: durationMin,
             candidate_label: labelText,
-            icon_required: type === 'transit-bus' || type === 'transit' || type === 'subway',
+            icon_required: type === 'bus' || type === 'transit-bus' || type === 'transit' || type === 'subway',
             label_need_px: labelNeedPx,
             estimated_width_px: 0,
             show_icon: false,
@@ -20602,8 +20738,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         });
       }
 
-      function buildTransitPickerTimeBarHtml(transitOption, isDepart) {
-        var segments = buildTransitPickerTimeBarSegments(transitOption, isDepart);
+      function buildTransitPickerTimeBarHtml(transitOption, option, isDepart) {
+        var segments = buildTransitPickerTimeBarSegments(transitOption, option, isDepart);
         if (!segments.length) return '';
         var segmentsHtml = segments.map(function(segment, index) {
           var type = String(segment.type || 'walk').trim().toLowerCase();
@@ -20648,7 +20784,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var timeline = buildTransitTimelineData(option, currentPlaceName || '', isDepart, transitOption);
         var routeTitleHtml = buildTransitAccessRouteTitleHtml(transitOption && transitOption.access_legs) ||
           '<span class="route-transit-option-title-segment fallback">대중교통 경로</span>';
-        var pickerDurationSec = getTransitOptionPickerTotalDurationSec(transitOption);
+        var pickerDurationSec = getTransitOptionPickerTotalDurationSec(transitOption, option, isDepart);
         var totalMinutes = Math.max(1, Math.round(pickerDurationSec / 60) || 1);
         var isApplied = (
           getRouteModeSelection(option) === 'transit' &&
@@ -20690,7 +20826,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
                 '</div>' +
                 applyButtonHtml +
               '</div>' +
-              buildTransitPickerTimeBarHtml(transitOption, isDepart) +
+              buildTransitPickerTimeBarHtml(transitOption, option, isDepart) +
             '</div>' +
             expandedHtml +
           '</div>';
@@ -20838,10 +20974,13 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           emptyMessage: ''
         };
         renderTransitPickerView();
-        fetchTransitOptionsForRoute(option, card)
+        fetchTransitOptionsForRoute(option, card, isDepart)
           .then(function(payload) {
             option.__transitLoading = false;
-            if (!activeTransitPickerState || Number(activeTransitPickerState.routeId) !== Number(option.route_id)) return;
+            if (!activeTransitPickerState || Number(activeTransitPickerState.routeId) !== Number(option.route_id)) {
+              syncRouteModeButtonsForOption(option, currentPlaceName || '', !!currentIsDepart, currentRouteOptions || []);
+              return;
+            }
             activeTransitPickerState.payload = payload;
             if (!payload || !Array.isArray(payload.options) || payload.options.length === 0) {
               activeTransitPickerState.status = 'empty';
@@ -20853,7 +20992,10 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           })
           .catch(function(err) {
             option.__transitLoading = false;
-            if (!activeTransitPickerState || Number(activeTransitPickerState.routeId) !== Number(option.route_id)) return;
+            if (!activeTransitPickerState || Number(activeTransitPickerState.routeId) !== Number(option.route_id)) {
+              syncRouteModeButtonsForOption(option, currentPlaceName || '', !!currentIsDepart, currentRouteOptions || []);
+              return;
+            }
             activeTransitPickerState.status = 'error';
             activeTransitPickerState.errorMessage = buildTransitRequestError(err);
             renderTransitPickerView();
@@ -20863,6 +21005,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function buildRouteModeButtonsHtml(option) {
         var selectedMode = getRouteModeSelection(option);
         var transitLoading = !!(option && option.__transitLoading);
+        var transitCompleted = hasCompletedTransitCollection(option);
         return '' +
           '<div class="route-mode-row">' +
             '<button type="button" class="route-mode-btn' + (selectedMode === 'walk' ? ' active' : '') + '" data-route-mode="walk">' +
@@ -20870,11 +21013,50 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               '<span class="route-mode-btn-label">도보</span>' +
             '</button>' +
             '<button type="button" class="route-mode-btn' + (selectedMode === 'transit' ? ' active' : '') + (transitLoading ? ' loading' : '') + '"' +
-              ' data-route-mode="transit"' + (transitLoading ? ' disabled' : '') + '>' +
+              ' data-route-mode="transit">' +
               getRouteModeButtonIconHtml('transit') +
               '<span class="route-mode-btn-label">대중교통</span>' +
+              (transitCompleted ? '<span class="route-mode-btn-check" aria-hidden="true">✓</span>' : '') +
             '</button>' +
           '</div>';
+      }
+
+      function bindRouteModeButtonHandlers(card, option, placeName, isDepart, optionsRef) {
+        if (!card || !option) return;
+        var walkModeBtn = card.querySelector('.route-mode-btn[data-route-mode="walk"]');
+        var transitModeBtn = card.querySelector('.route-mode-btn[data-route-mode="transit"]');
+        if (walkModeBtn) {
+          walkModeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setSelectedRouteMode(option, 'walk');
+            setCurrentPinnedRoute(option);
+            renderRouteCards(currentRouteOptions || optionsRef || [], placeName, isDepart);
+          });
+        }
+        if (transitModeBtn) {
+          transitModeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openTransitPickerForRoute(option, isDepart);
+          });
+        }
+      }
+
+      function syncRouteModeButtonsForOption(option, placeName, isDepart, optionsRef) {
+        if (!routeOptionsWrap || !option) return;
+        var renderToken = String(option.__renderCardToken || '').trim();
+        if (!renderToken) return;
+        routeOptionsWrap.querySelectorAll('.route-option-card[data-route-card-token="' + renderToken + '"]').forEach(function(card) {
+          var currentRow = card.querySelector('.route-mode-row');
+          if (!currentRow) return;
+          var wrapper = document.createElement('div');
+          wrapper.innerHTML = buildRouteModeButtonsHtml(option);
+          var nextRow = wrapper.firstElementChild;
+          if (!nextRow) return;
+          currentRow.replaceWith(nextRow);
+          bindRouteModeButtonHandlers(card, option, placeName, isDepart, optionsRef);
+        });
       }
 
       function getRouteShareKindLabel(option, isDepart) {
@@ -21165,11 +21347,13 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           }
           routeOptionsWrap.appendChild(card);
         }
-        if (isMobile()) setSheetState('sheet-half');
+        if (isMobile()) setSheetState(String(opts.mobileSheetState || 'sheet-half'));
       }
 
       function showSharedRouteLoading() {
-        showSharedRouteStateCard('공유 링크', '공유된 노선 정보를 불러오는 중입니다...');
+        showSharedRouteStateCard('공유 링크', '공유된 노선 정보를 불러오는 중입니다...', {
+          mobileSheetState: 'sheet-peek'
+        });
       }
 
       function primeSharedWalkCache(snapshot, option, isDepart) {
@@ -21292,6 +21476,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
             routeOption.board_time ||
             ''
           );
+          routeOption.route_stops = cloneJsonValue(sharedVariantDetail.route_stops) || [];
           if (String(sharedVariantDetail.selected_operator || '').trim()) {
             routeOption.operator = String(sharedVariantDetail.selected_operator || '').trim();
           }
@@ -21303,14 +21488,14 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         applySnapshotRouteModeStateToOption(routeOption, snapshot);
         currentPinnedRouteId = Number(routeOption.route_id || 0) || 0;
         var shouldRestoreSharedDetail = !!snapshot.shared_detail_open && !isMobile();
+        if (isMobile()) {
+          setSheetState('sheet-peek');
+        }
 
         var options = [routeOption];
         options._searchMode = activeRouteSearchMode;
         renderRouteOptions(options, placeName, isDepart, '', true);
         renderSharedRouteBanner();
-        if (isMobile()) {
-          setSheetState('sheet-peek');
-        }
 
         if (shouldRestoreSharedDetail) {
           var sharedCard = routeOptionsWrap ? routeOptionsWrap.querySelector('.route-option-card') : null;
@@ -21879,8 +22064,6 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           var btnDetail = card.querySelector('.btn-route-detail');
           var btnFavorite = card.querySelector('.btn-route-favorite');
           var btnShare = card.querySelector('.btn-route-share');
-          var walkModeBtn = card.querySelector('.route-mode-btn[data-route-mode="walk"]');
-          var transitModeBtn = card.querySelector('.route-mode-btn[data-route-mode="transit"]');
           var toggleRouteDetail = function() {
             if (expandedOptionIndex === idx) {
               activateRouteCardOptionView(card, opt, placeName, isDepart);
@@ -21915,22 +22098,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               shareRouteOption(opt, card, btnShare);
             });
           }
-          if (walkModeBtn) {
-            walkModeBtn.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              setSelectedRouteMode(opt, 'walk');
-              setCurrentPinnedRoute(opt);
-              renderRouteCards(currentRouteOptions || options, placeName, isDepart);
-            });
-          }
-          if (transitModeBtn) {
-            transitModeBtn.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              openTransitPickerForRoute(opt, isDepart);
-            });
-          }
+          bindRouteModeButtonHandlers(card, opt, placeName, isDepart, options);
           routeOptionsWrap.appendChild(card);
           syncRouteCardTimeSummary(card, opt, placeName, isDepart);
         });
@@ -26174,14 +26342,15 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       }
       if (typeof kakao !== 'undefined' && kakao.maps) {
         initMap();
+        var sharedRouteReadyPromise = pendingSharedRouteToken
+          ? loadSharedRouteSnapshot(pendingSharedRouteToken)
+          : Promise.resolve(false);
         var authReadyPromise = refreshAuthState();
         var sitesReadyPromise = Promise.resolve(loadSites());
-        Promise.allSettled([authReadyPromise, sitesReadyPromise])
+        Promise.allSettled([authReadyPromise, sitesReadyPromise, sharedRouteReadyPromise])
           .finally(function() {
             updateMapControlsPosition();
-            if (pendingSharedRouteToken) {
-              loadSharedRouteSnapshot(pendingSharedRouteToken);
-            } else if (isMobile()) {
+            if (!sharedRouteState.active && isMobile()) {
               setSheetState('sheet-peek');
             }
           });
