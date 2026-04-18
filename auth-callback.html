@@ -270,6 +270,10 @@
       }
 
       var errMsg = params.get('message') || '로그인 처리에 실패했습니다.';
+      if (/SamsungBrowser/i.test(navigator.userAgent || '')) {
+        errMsg += '\n\n삼성 인터넷의 이메일 자동 인식 때문에 간헐적으로 실패할 수 있습니다. ' +
+                  '다시 시도하실 때 계정의 이메일이 아닌 이름 부분을 탭해 주세요.';
+      }
       title.textContent = '로그인 실패';
       subtitle.textContent = '아래 내용을 확인해 주세요.';
       message.textContent = errMsg;
