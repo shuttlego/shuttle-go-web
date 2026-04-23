@@ -4035,12 +4035,10 @@
     .pin-marker {
       width: 32px;
       height: 32px;
-      margin-left: -16px;
-      margin-bottom: -32px;
       background: url('place_icon.png') center/contain no-repeat;
       cursor: pointer;
       transition: transform 0.15s ease;
-      transform-origin: 16px 32px;
+      transform-origin: 50.2% 85.4%;
       transform: scale(var(--pin-scale, 1));
     }
     .pin-marker.hover, .pin-marker.selected {
@@ -8886,6 +8884,8 @@
       var map = null;
       var overlays = [];
       var markerElements = [];
+      var PLACE_PIN_TIP_X_ANCHOR = 0.502;
+      var PLACE_PIN_TIP_Y_ANCHOR = 0.854;
       var places = [];
       var resultsPanelState = 'idle';
       var selectedSiteId = '0000013';
@@ -13871,6 +13871,9 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           : '';
       }
       function resolveInitialSiteId() {
+        if (pendingSharedRouteToken || sharedRouteState.active) {
+          if (siteOptionExists(selectedSiteId)) return selectedSiteId;
+        }
         var preferredSiteId = getPreferredSiteIdFromAuthState();
         if (siteOptionExists(preferredSiteId)) return preferredSiteId;
         if (siteOptionExists(selectedSiteId)) return selectedSiteId;
@@ -16275,7 +16278,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var overlay = new kakao.maps.CustomOverlay({
           position: pos,
           content: el,
-          yAnchor: 1
+          xAnchor: PLACE_PIN_TIP_X_ANCHOR,
+          yAnchor: PLACE_PIN_TIP_Y_ANCHOR
         });
         overlay.setMap(map);
         overlays.push(overlay);
@@ -16350,7 +16354,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         var overlay = new kakao.maps.CustomOverlay({
           position: new kakao.maps.LatLng(lat, lng),
           content: el,
-          yAnchor: 1
+          xAnchor: PLACE_PIN_TIP_X_ANCHOR,
+          yAnchor: PLACE_PIN_TIP_Y_ANCHOR
         });
         overlay.setMap(map);
         hoverPlaceOverlay = overlay;
@@ -16451,7 +16456,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function getBubblePinTopOffset(hasPin) {
         if (!hasPin) return 0;
         var pinScale = parseFloat(mapContainer.style.getPropertyValue('--pin-scale')) || 1;
-        return Math.round(16 * pinScale);
+        return Math.round(32 * PLACE_PIN_TIP_Y_ANCHOR * pinScale);
       }
 
       function getBubbleMarkerAnchorPoint(markerIndex) {
