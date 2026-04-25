@@ -8982,6 +8982,15 @@
         createdAt: '',
         expiresAt: ''
       };
+      var sharedRouteContextLock = {
+        active: false,
+        token: '',
+        siteId: '',
+        dayType: '',
+        direction: '',
+        routeSearchMode: '',
+        maxDistanceKm: null
+      };
       var favoriteRouteState = {
         active: false,
         favoriteRouteId: 0,
@@ -12470,7 +12479,9 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           });
         }
         endpointOptions = endpointOptionsAll.slice();
-        persistCurrentEndpointSelection({ saveRemote: false });
+        // Shared snapshots should not overwrite the viewer's normal endpoint cache.
+        // If the viewer edits endpoints, applyEndpointPickerSelection persists that
+        // explicit choice and the next search exits shared snapshot mode.
         updateEndpointTriggerText();
       }
 
@@ -12571,7 +12582,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
           updateSiteTriggerText();
         }
 
-        return refreshDayTypeOptionsForSite(selectedSiteId || siteId || '0000011')
+        return refreshDayTypeOptionsForSite(selectedSiteId || siteId || '0000011', { preserveDayType: dayType })
           .catch(function() { return true; })
           .then(function() {
             ensureContextDayTypeSelected(dayType);
@@ -13760,16 +13771,27 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         return out;
       }
 
-      function applyAvailableDayTypes(dayTypeValues) {
+      function applyAvailableDayTypes(dayTypeValues, opts) {
+        opts = opts || {};
         if (!Array.isArray(dayTypeValues)) {
           updateDepartureTriggerText();
           return;
         }
-        DAY_TYPE_OPTIONS = buildDayTypeOptionsFromValues(dayTypeValues);
+        var values = dayTypeValues.slice();
+        var preserveDayType = String(opts.preserveDayType || '').trim();
+        if (preserveDayType && values.indexOf(preserveDayType) < 0) {
+          values.push(preserveDayType);
+        }
+        DAY_TYPE_OPTIONS = buildDayTypeOptionsFromValues(values);
 
         var hasSelected = DAY_TYPE_OPTIONS.some(function(opt) { return opt.value === selectedDayType; });
         if (!hasSelected) {
-          selectedDayType = DAY_TYPE_OPTIONS.length > 0 ? DAY_TYPE_OPTIONS[0].value : 'weekday';
+          var hasPreserve = preserveDayType && DAY_TYPE_OPTIONS.some(function(opt) {
+            return opt.value === preserveDayType;
+          });
+          selectedDayType = hasPreserve
+            ? preserveDayType
+            : (DAY_TYPE_OPTIONS.length > 0 ? DAY_TYPE_OPTIONS[0].value : 'weekday');
         }
 
         var hasPending = DAY_TYPE_OPTIONS.some(function(opt) { return opt.value === pendingDayType; });
@@ -15574,9 +15596,11 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         }
       }
 
-      function refreshDayTypeOptionsForSite(siteId) {
+      function refreshDayTypeOptionsForSite(siteId, opts) {
+        opts = opts || {};
+        var requestedSiteId = String(siteId || '').trim();
         var requestId = ++dayTypeRequestSerial;
-        return fetch(API_BASE + '/api/shuttle/day-types?site_id=' + encodeURIComponent(siteId))
+        return fetch(API_BASE + '/api/shuttle/day-types?site_id=' + encodeURIComponent(requestedSiteId))
           .then(function(r) {
             return r.json().catch(function() { return {}; }).then(function(data) {
               return { ok: r.ok, data: data };
@@ -15588,7 +15612,8 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
               throw new Error(result.data.error || '요일 목록 조회에 실패했습니다.');
             }
             var dayTypes = Array.isArray(result.data.day_types) ? result.data.day_types : [];
-            applyAvailableDayTypes(dayTypes);
+            var preserveDayType = String(opts.preserveDayType || '').trim() || getSharedRoutePreservedDayType(requestedSiteId);
+            applyAvailableDayTypes(dayTypes, { preserveDayType: preserveDayType });
             return true;
           })
           .catch(function() {
@@ -21255,6 +21280,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         sharedRouteState.snapshot = null;
         sharedRouteState.createdAt = '';
         sharedRouteState.expiresAt = '';
+        clearSharedRouteContextLock();
         pendingSharedRouteToken = '';
         removeRouteSnapshotBanner();
         if (opts.replaceUrl !== false) replaceUrlWithHomePath();
@@ -21272,7 +21298,44 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
       function clearPendingSharedRouteUrl() {
         if (!pendingSharedRouteToken) return;
         pendingSharedRouteToken = '';
+        if (!sharedRouteState.active) clearSharedRouteContextLock();
         if (!sharedRouteState.active) replaceUrlWithHomePath();
+      }
+
+      function activateSharedRouteContextLock(snapshot, token) {
+        var source = snapshot && typeof snapshot === 'object' ? snapshot : {};
+        sharedRouteContextLock = {
+          active: true,
+          token: String(token || sharedRouteState.token || '').trim(),
+          siteId: String(source.site_id || '').trim(),
+          dayType: String(source.day_type || '').trim(),
+          direction: String(source.direction || '').trim().toLowerCase(),
+          routeSearchMode: normalizeRouteSearchMode(source.route_search_mode || activeRouteSearchMode),
+          maxDistanceKm: normalizeRouteMaxDistanceKm(source.max_distance_km)
+        };
+        // Any day-type request started before the shared snapshot was known must
+        // not be allowed to overwrite the snapshot's day type when it resolves.
+        dayTypeRequestSerial += 1;
+      }
+
+      function clearSharedRouteContextLock() {
+        sharedRouteContextLock = {
+          active: false,
+          token: '',
+          siteId: '',
+          dayType: '',
+          direction: '',
+          routeSearchMode: '',
+          maxDistanceKm: null
+        };
+      }
+
+      function getSharedRoutePreservedDayType(siteId) {
+        if (!sharedRouteContextLock.active || !sharedRouteState.active) return '';
+        var lockSiteId = String(sharedRouteContextLock.siteId || '').trim();
+        var requestedSiteId = String(siteId || '').trim();
+        if (lockSiteId && requestedSiteId && lockSiteId !== requestedSiteId) return '';
+        return String(sharedRouteContextLock.dayType || '').trim();
       }
 
       function getCurrentSharePlacePayload() {
@@ -25577,6 +25640,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         sharedRouteState.createdAt = String(meta && meta.createdAt || '');
         sharedRouteState.expiresAt = String(meta && meta.expiresAt || '');
         pendingSharedRouteToken = sharedRouteState.token;
+        activateSharedRouteContextLock(snapshot, sharedRouteState.token);
         var sharedSnapshotCacheKey = getRouteShareCacheKey(snapshot);
         if (sharedSnapshotCacheKey && sharedRouteState.token) {
           routeShareTokenCache.set(sharedSnapshotCacheKey, sharedRouteState.token);
@@ -25594,7 +25658,7 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         if (dayTypeValues.indexOf(String(snapshot.day_type || '')) < 0) {
           dayTypeValues.push(String(snapshot.day_type || ''));
         }
-        applyAvailableDayTypes(dayTypeValues);
+        applyAvailableDayTypes(dayTypeValues, { preserveDayType: String(snapshot.day_type || '').trim() });
         selectedDayType = String(snapshot.day_type || selectedDayType || 'weekday');
         pendingDayType = selectedDayType;
         selectedRouteTimeBasis = normalizeRouteTimeBasis(snapshot.time_basis || selectedRouteTimeBasis);
@@ -25865,9 +25929,19 @@ Shuttle Go(이하 “서비스”)는 이용자의 개인정보를 중요하게 
         );
         var previousDefaultMaxDistance = defaultMaxDistanceKm;
         defaultRouteSearchMode = nextMode;
-        activeRouteSearchMode = nextMode;
         defaultMaxDistanceKm = nextDefaultMaxDistance;
+        if (sharedRouteContextLock.active && sharedRouteState.active) {
+          updateMaxDistanceUi();
+          syncSettingsModalUi();
+          return;
+        }
+        activeRouteSearchMode = nextMode;
         if (!authState || !authState.logged_in) {
+          if (routeMaxDistanceSessionDirty) {
+            updateMaxDistanceUi();
+            syncSettingsModalUi();
+            return;
+          }
           maxDistanceKm = nextDefaultMaxDistance;
           maxDistancePendingKm = nextDefaultMaxDistance;
           routeMaxDistanceSessionDirty = false;
